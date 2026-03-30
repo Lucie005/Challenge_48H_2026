@@ -36,6 +36,8 @@ class Student(User):
     filiere = db.Column(db.String(50))
     skills = db.Column(db.Text)
     is_searching_job = db.Column(db.Boolean, default=False)
+    Edt = db.Column(db.String(100))
+    bio = db.Column(db.Text)
 
     __mapper_args__ = {'polymorphic_identity': 'student'}
 
