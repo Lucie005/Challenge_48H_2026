@@ -11,7 +11,7 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
     
     # Système d'héritage (Polymorphisme)
     user_type = db.Column(db.String(20), nullable=False)
@@ -74,7 +74,7 @@ class Post(db.Model):
     media_url = db.Column(db.String(255))
     media_type = db.Column(db.String(20), default='text') # text, image, video
     is_reel = db.Column(db.Boolean, default=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.now)
     author = db.relationship('User', backref='posts', foreign_keys=[author_id])
 
 class Message(db.Model):
@@ -84,4 +84,4 @@ class Message(db.Model):
     receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     body = db.Column(db.Text, nullable=False)
     is_read = db.Column(db.Boolean, default=False)
-    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    sent_at = db.Column(db.DateTime, default=datetime.now)
