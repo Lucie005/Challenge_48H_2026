@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chat + EDT</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      padding: 30px;
+    }
+
+    .section {
+      max-width: 700px;
+      margin: 0 auto 30px auto;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    input, button {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+    }
+
+    input {
+      width: 70%;
+    }
+
+    button {
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+    }
+
+    #messages {
+      height: 250px;
+      overflow-y: auto;
+      background: #0f0f0f;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 15px 0;
+    }
+
+    .msg {
+      margin: 8px 0;
+      padding: 8px 10px;
+      border-radius: 8px;
+    }
+
+    .user {
+      background: #2563eb;
+      text-align: right;
+    }
+
+    .bot {
+      background: #333;
+      text-align: left;
+    }
+
+    #edt-list {
+      margin-top: 20px;
+    }
+
+    .course {
+      background: #2a2a2a;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+
+    .course-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .error {
+      color: #ff6b6b;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="section">
+    <h2>Module IA</h2>
+    <div id="messages"></div>
+    <input type="text" id="user-input" placeholder="Écris ton message..." />
+    <button id="send-btn">Envoyer</button>
+  </div>
+
+  <div class="section">
+    <h2>Ajouter mon EDT</h2>
+    <input type="text" id="ical-url" placeholder="Colle ici ton lien iCal..." />
+    <button id="load-edt-btn">Charger l’EDT</button>
+    <div id="edt-error" class="error"></div>
+    <div id="edt-list"></div>
+  </div>
+
+<script>
+  const sendBtn = document.getElementById("send-btn");
+  const userInput = document.getElementById("user-input");
+  const messages = document.getElementById("messages");
+
+  const loadEdtBtn = document.getElementById("load-edt-btn");
+  const icalUrlInput = document.getElementById("ical-url");
+  const edtList = document.getElementById("edt-list");
+  const edtError = document.getElementById("edt-error");
+
+  let allEvents = [];
+  let expanded = false;
+
+  function addMessage(text, sender) {
+    const div = document.createElement("div");
+    div.className = `msg ${sender}`;
+    div.textContent = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const text = userInput.value.trim();
+    if (!text) return;
+
+    addMessage(text, "user");
+    userInput.value = "";
+
+    const response = await fetch("/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: text })
+    });
+
+    const data = await response.json();
+    addMessage(data.reply || "Erreur.", "bot");
+  }
+
+  function renderEdt() {
+    edtList.innerHTML = "";
+
+    if (!allEvents || allEvents.length === 0) {
+      edtList.innerHTML = "<p>Aucun cours trouvé.</p>";
+      return;
+    }
+
+    const eventsToShow = expanded ? allEvents : allEvents.slice(0, 2);
+
+    eventsToShow.forEach(event => {
+      const div = document.createElement("div");
+      div.className = "course";
+      div.innerHTML = `
+        <div class="course-title">${event.summary}</div>
+        <div><strong>Début :</strong> ${event.start}</div>
+        <div><strong>Fin :</strong> ${event.end}</div>
+        <div><strong>Lieu :</strong> ${event.location || "Non précisé"}</div>
+        <div><strong>Description :</strong> ${event.description || "Aucune"}</div>
+      `;
+      edtList.appendChild(div);
+    });
+
+    if (allEvents.length > 2) {
+      const toggleBtn = document.createElement("button");
+      toggleBtn.textContent = expanded ? "Afficher moins ▲" : "Afficher plus ▼";
+      toggleBtn.style.marginTop = "10px";
+      toggleBtn.addEventListener("click", () => {
+        expanded = !expanded;
+        renderEdt();
+      });
+      edtList.appendChild(toggleBtn);
+    }
+  }
+
+  async function loadEdt() {
+    const icalUrl = icalUrlInput.value.trim();
+    edtError.textContent = "";
+    edtList.innerHTML = "";
+    allEvents = [];
+    expanded = false;
+
+    if (!icalUrl) {
+      edtError.textContent = "Colle un lien iCal.";
+      return;
+    }
+
+    const response = await fetch("/load_edt", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ ical_url: icalUrl })
+    });
+
+    const data = await response.json();
+
+    if (data.error) {
+      edtError.textContent = data.error;
+      return;
+    }
+
+    allEvents = data.events || [];
+    renderEdt();
+  }
+
+  sendBtn.addEventListener("click", sendMessage);
+  userInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
+
+  loadEdtBtn.addEventListener("click", loadEdt);
+</script>
+</body>
+</html>
