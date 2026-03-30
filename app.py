@@ -1,41 +1,42 @@
 from flask import Flask, request, session, redirect, url_for, render_template
 from modeles import db, User, Student, StaffYnov, ExternalUser, Message
+from werkzeug.security import generate_password_hash
 import os
 
 app = Flask(__name__)
 
-# --- CONFIGURATION MYSQL ---
-# Remplace 'root', 'ton_mdp' et 'ynov_social' par tes vrais identifiants MySQL
-DB_USER = "root"
-DB_PASSWORD = "Admin123!" # Mets ton mot de passe ici (souvent vide sur XAMPP)
-DB_HOST = "127.0.0.1:3307" # Ton SQL indique le port 3307
-DB_NAME = "ynov_social"
-
-# On utilise mysql+pymysql pour la compatibilité avec SQLAlchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+# --- CONFIGURATION MYSQL CORRIGÉE ---
+# Utilisation de 127.0.0.1 (plus stable) et du port 3306 vu sur ton image Workbench
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Admin123!@127.0.0.1:3306/ynov_social'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key_48h')
 
-# Initialisation de la base de données avec Flask
+# Initialisation de la base
 db.init_app(app)
 
 with app.app_context():
-    # Crée automatiquement les tables dans MySQL si elles n'existent pas encore
-    db.create_all()
+    # On vérifie si l'admin existe déjà par son USERNAME ou son EMAIL
+    admin_exists = User.query.filter((User.username == 'admin') | (User.email == 'admin@ynov.com')).first()
     
-    # Création du compte admin personnalisé si inexistant
-    if not User.query.filter_by(username='admin').first():
+    if not admin_exists:
+        print("Création du compte admin...")
         admin = StaffYnov(
             username='admin',
             email='admin@ynov.com',
-            role_title='Administrateur Principal'
+            role_title='Administrateur Principal',
+            user_type='staff'
         )
         admin.set_password('Admin123!')
-        admin.can_moderate = True  # L'admin possède les droits par défaut
-        # Forcer le type car l'admin est un Staff
-        admin.user_type = 'staff'
         db.session.add(admin)
         db.session.commit()
+    else:
+        print("Le compte admin existe déjà, on passe à la suite.")
+
+# --- ROUTES ---
+
+@app.route('/')
+def home():
+    return "Serveur Flask actif et connecté à MySQL ! Allez sur /register pour tester."
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -53,63 +54,51 @@ def register():
         return "Email ou nom d'utilisateur déjà utilisé", 400
 
     # 2. Créer le bon type d'objet selon le choix du formulaire
-    if user_type == 'student':
-        new_user = Student(
-            username=username,
-            email=email,
-            filiere=data.get('filiere'),
-            skills=data.get('skills'),
-            is_searching_job='is_searching_job' in data,
-            Edt=data.get('Edt'),
-            bio=data.get('bio')
-        )
-    elif user_type == 'staff':
-        new_user = StaffYnov(
-            username=username,
-            email=email,
-            role_title=data.get('role_title')
-        )
-    elif user_type == 'external':
-        new_user = ExternalUser(
-            username=username,
-            email=email,
-            organization=data.get('organization'),
-            description=data.get('description')
-        )
-    else:
-        return "Type d'utilisateur invalide", 400
-
-    # 3. Hachage sécurisé via ta méthode de classe
-    new_user.set_password(password)
-    
-    db.session.add(new_user)
-    db.session.commit()
-    
-    # Demande de modération : envoi d'un message interne à l'admin
-    if user_type == 'staff' and 'request_moderation' in data:
-        admin_account = User.query.filter_by(username='admin').first()
-        if admin_account:
-            demande_msg = Message(
-                sender_id=new_user.id,
-                receiver_id=admin_account.id,
-                body=f"DEMANDE DE MODÉRATION : L'utilisateur {new_user.username} (ID: {new_user.id}) sollicite les droits."
+    try:
+        if user_type == 'student':
+            new_user = Student(
+                username=username,
+                email=email,
+                filiere=data.get('filiere'),
+                bio=data.get('bio')
             )
-            db.session.add(demande_msg)
-            db.session.commit()
+        elif user_type == 'staff':
+            new_user = StaffYnov(
+                username=username,
+                email=email,
+                role_title=data.get('role_title')
+            )
+        else:
+            new_user = ExternalUser(
+                username=username,
+                email=email,
+                organization=data.get('organization')
+            )
 
-    return "Inscription réussie !"
+        # 3. Hachage du mot de passe
+        new_user.set_password(password)
+        
+        db.session.add(new_user)
+        db.session.commit()
+        return "Inscription réussie ! Vous pouvez maintenant vérifier dans MySQL Workbench."
 
-@app.route('/login', methods=['POST'])
+    except Exception as e:
+        db.session.rollback()
+        return f"Erreur lors de l'inscription : {e}", 500
+    
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'GET':
+        return render_template('login.html') # Assure-toi d'avoir ce fichier
+
     data = request.form
     email = data.get('email')
     password = data.get('password')
 
     user = User.query.filter_by(email=email).first()
 
-    # Vérification : l'utilisateur existe ET le hash correspond
     if user and user.check_password(password):
-        # Stockage en session
         session['user_id'] = user.id
         session['username'] = user.username
         session['user_type'] = user.user_type
@@ -120,11 +109,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
-    return "Déconnexion réussie !"
-
-@app.route('/')
-def home():
-    return "Serveur Flask actif et connecté à MySQL !"
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
     app.run(debug=True)

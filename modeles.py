@@ -28,6 +28,13 @@ class User(db.Model):
 
     def get_avatar(self):
         return f"https://ui-avatars.com/api/?name={self.username}&background=random"
+    
+class Campus(db.Model):
+    __tablename__ = 'campus'
+    id = db.Column(db.Integer, primary_key=True)
+    nom = db.Column(db.String(200), nullable=False)
+    ville = db.Column(db.String(100), nullable=False)
+    pays = db.Column(db.String(100), default='France')
 
 # --- CLASSES FILLES ---
 class Student(User):
