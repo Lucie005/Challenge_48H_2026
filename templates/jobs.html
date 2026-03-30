@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Y - Ymatch Jobs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+
+    <header class="mobile-header">
+        <div class="logo-y-mini">Y</div>
+        <span class="mobile-header-title">Paris Ynov Campus</span>
+    </header>
+
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <a href="#" class="logo-btn">Y</a>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
+                <a href="profile.html" class="nav-icon" title="Profil"><i class="far fa-user"></i></a>
+                <a href="messages.html" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
+                <a href="student.html" class="nav-icon" title="Étudiants"><i class="fas fa-user-friends"></i></a>
+                <a href="jobs.html" class="nav-icon active" title="Jobs"><i class="fas fa-briefcase"></i></a>
+            </nav>
+            <div class="spacer"></div>
+            <a href="#" class="nav-icon btn-add"><i class="fas fa-plus"></i></a>
+            
+            <img src="https://ui-avatars.com/api/?name=Alex+Martin&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
+            <a href="auth.html" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-wrapper jobs-wrapper">
+                
+                <div class="jobs-header">
+                    <div class="jobs-title">
+                        <div class="icon-box"><i class="fas fa-briefcase"></i></div>
+                        <div>
+                            <h2>Ymatch <span style="color: var(--primary);">Jobs</span></h2>
+                            <span class="text-muted">Stages & alternances · Paris Ynov Campus</span>
+                        </div>
+                    </div>
+                    
+                    <div class="jobs-stats">
+                        <div class="stat-box"><span class="stat-num text-primary">6</span><span class="stat-label">Offres</span></div>
+                        <div class="stat-box"><span class="stat-num text-blue">120+</span><span class="stat-label">Entreprises</span></div>
+                        <div class="stat-box"><span class="stat-num text-green">850+</span><span class="stat-label">Placements</span></div>
+                    </div>
+                </div>
+
+                <div class="jobs-search-bar card">
+                    <i class="fas fa-search text-muted"></i>
+                    <input type="text" placeholder="Rechercher par titre, entreprise...">
+                    <div class="jobs-filters">
+                        <i class="fas fa-filter text-muted"></i>
+                        <button class="filter-btn active">Tout</button>
+                        <button class="filter-btn">Stage</button>
+                        <button class="filter-btn">Alternance</button>
+                    </div>
+                </div>
+
+                <div class="jobs-grid">
+                    {% for job in job_offers %}
+                    <div class="card job-card">
+                        <div class="job-card-header">
+                            <div class="company-logo">
+                                {{ job.entreprise[:2] | upper }}
+                            </div>
+                            <div class="job-meta">
+                                <h3>{{ job.titre }}</h3>
+                                <span class="text-muted">{{ job.entreprise }}</span>
+                            </div>
+                            <i class="far fa-star bookmark-icon"></i>
+                        </div>
+                        
+                        <div class="job-tags">
+                            {% if job.type == 'stage' %}
+                                <span class="badge badge-stage">Stage</span>
+                            {% else %}
+                                <span class="badge badge-alternance">Alternance</span>
+                            {% endif %}
+                            <span class="text-muted small-text"><i class="fas fa-map-marker-alt"></i> {{ job.lieu }}</span>
+                            <span class="text-muted small-text"><i class="far fa-clock"></i> {{ job.duree }}</span>
+                        </div>
+
+                        <p class="job-description">
+                            {{ job.description }}
+                        </p>
+                        
+                        <div class="job-card-footer">
+                            <a href="{{ job.lien | default('#') }}" target="_blank" class="btn-postuler">Postuler sur Ymatch <i class="fas fa-external-link-alt"></i></a>
+                            <div class="text-muted small-text" style="text-align: center; margin-top: 10px;">Publiée le {{ job.created_at.strftime('%d/%m/%Y') if job.created_at else 'Récemment' }}</div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                        <p class="text-muted">Aucune offre disponible pour le moment.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

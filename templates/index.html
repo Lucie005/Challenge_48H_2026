@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Y - Fil d'actualité</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+
+    <header class="mobile-header">
+        <div class="logo-y-mini">Y</div>
+        <span class="mobile-header-title">Paris Ynov Campus</span>
+    </header>
+
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <a href="#" class="logo-btn">Y</a>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-icon active" title="Accueil"><i class="fas fa-home"></i></a>
+                <a href="profile.html" class="nav-icon" title="Profil"><i class="far fa-user"></i></a>
+                <a href="messages.html" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
+                <a href="student.html" class="nav-icon" title="Étudiants"><i class="fas fa-user-friends"></i></a>
+                <a href="jobs.html" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
+            </nav>
+            <div class="spacer"></div>
+            <a href="#" class="nav-icon btn-add"><i class="fas fa-plus"></i></a>
+            <img src="https://ui-avatars.com/api/?name=Alex+Martin&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
+            <a href="auth.html" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-wrapper">
+                
+                <section class="feed-column">
+                    <div class="feed-header">
+                        <div>
+                            <h2>Fil d'actualité</h2>
+                            <span class="text-muted">Paris Ynov Campus</span>
+                        </div>
+                        <div class="feed-filters">
+                            <button class="filter-btn active">Tout</button>
+                            <button class="filter-btn">Post</button>
+                            <button class="filter-btn">Projet</button>
+                            <button class="filter-btn">Recherche</button>
+                        </div>
+                    </div>
+
+                    <div class="card create-post">
+                        <img src="https://ui-avatars.com/api/?name=Alex+Martin&background=7C3AED&color=fff&size=50" alt="Avatar" class="avatar">
+                        <textarea placeholder="Partager avec les étudiants de Paris Ynov Campus..." rows="2"></textarea>
+                    </div>
+
+                    {% for post in posts %}
+                    <article class="card post-card">
+                        <div class="post-header">
+                            <img src="../static/img/{{ post.author.photo | default('default-avatar.jpg') }}" alt="{{ post.author.username }}" class="avatar">
+                            <div class="post-meta">
+                                <h4>{{ post.author.username }} 
+                                    {% if post.is_projet %}
+                                        <span class="badge badge-projet">🚀 Projet</span>
+                                    {% else %}
+                                        <span class="badge badge-post">Post</span>
+                                    {% endif %}
+                                </h4>
+                                <span class="text-muted">{{ post.author.filiere }} · {{ post.created_at }}</span>
+                            </div>
+                            <i class="far fa-bookmark bookmark-icon"></i>
+                        </div>
+                        <div class="post-body">
+                            <p>{{ post.content }}</p>
+                            <div class="post-tags">
+                                <span class="tag">#Ynov</span>
+                            </div>
+                        </div>
+                        <div class="post-footer">
+                            <button class="action-btn"><i class="far fa-heart"></i> {{ post.likes_count | default(0) }}</button>
+                            <button class="action-btn"><i class="far fa-comment"></i> {{ post.comments_count | default(0) }}</button>
+                            <button class="action-btn"><i class="fas fa-share-alt"></i></button>
+                        </div>
+                    </article>
+                    {% else %}
+                    <div class="card">
+                        <p class="text-muted" style="text-align: center; padding: 20px;">Aucun post pour le moment. Soyez le premier à publier !</p>
+                    </div>
+                    {% endfor %}
+                </section>
+
+                <aside class="right-column">
+                    <div class="card widget">
+                        <div class="widget-header">
+                            <h3>YnovBot IA</h3>
+                            <span class="status-badge"><i class="fas fa-robot"></i></span>
+                        </div>
+                        <p class="text-muted small-text">Posez vos questions sur le campus</p>
+                        <div class="chat-history" id="chat-history">
+                            <div class="chat-msg msg-bot">Bonjour ! Comment puis-je t'aider aujourd'hui ?</div>
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" id="ia-input" placeholder="Message..." onkeypress="if(event.key === 'Enter') sendToIA()">
+                            <button class="send-btn" onclick="sendToIA()"><i class="far fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="card widget">
+                        <div class="widget-header">
+                            <h3>Mon EDT</h3>
+                            <button class="action-btn" onclick="loadEDT()"><i class="fas fa-sync-alt"></i></button>
+                        </div>
+                        <div id="edt-container">
+                            <div class="edt-event">
+                                <h4>Architecture Web</h4>
+                                <span class="text-muted small-text">08:30 - 10:30 · Salle 301</span>
+                            </div>
+                            <div class="edt-event" style="border-left-color: #EC4899;">
+                                <h4>React Avancé</h4>
+                                <span class="text-muted small-text">10:45 - 12:45 · TP</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card widget">
+                        <div class="widget-header">
+                            <h3>News Ynov</h3>
+                        </div>
+                        <p class="text-muted small-text">Paris Ynov Campus</p>
+                        <div class="events-list">
+                            <div class="event-item event-orange">
+                                <i class="fas fa-bolt"></i>
+                                <div>
+                                    <h4>Challenge 48h Ynov</h4>
+                                    <span class="text-muted small-text">📅 11 avr. 📍 Paris</span>
+                                </div>
+                            </div>
+                            <div class="event-item event-blue">
+                                <i class="fas fa-gamepad"></i>
+                                <div>
+                                    <h4>Tournoi FIFA BDS</h4>
+                                    <span class="text-muted small-text">📅 5 avr. 📍 Paris</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        async function sendToIA() {
+            const inputField = document.getElementById('ia-input');
+            const history = document.getElementById('chat-history');
+            const message = inputField.value.trim();
+            
+            if(!message) return;
+
+            history.innerHTML += `<div class="chat-msg msg-user">${message}</div>`;
+            inputField.value = '';
+            history.scrollTop = history.scrollHeight;
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await response.json();
+                
+                history.innerHTML += `<div class="chat-msg msg-bot">${data.reply}</div>`;
+                history.scrollTop = history.scrollHeight;
+            } catch (error) {
+                history.innerHTML += `<div class="chat-msg msg-bot" style="color:red;">Erreur serveur.</div>`;
+            }
+        }
+
+        async function loadEDT() {
+            const container = document.getElementById('edt-container');
+            container.innerHTML = `<span class="text-muted small-text">Chargement...</span>`;
+            
+            const testIcalUrl = "URL_ICAL_DE_TEST"; 
+            
+            try {
+                const response = await fetch('/load_edt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ical_url: testIcalUrl })
+                });
+                const data = await response.json();
+                
+                if(data.events) {
+                    container.innerHTML = '';
+                    data.events.slice(0, 3).forEach(ev => {
+                        container.innerHTML += `
+                        <div class="edt-event">
+                            <h4>${ev.summary}</h4>
+                            <span class="text-muted small-text">${ev.start} · ${ev.location}</span>
+                        </div>`;
+                    });
+                } else {
+                    container.innerHTML = `<span class="text-muted small-text">Aucun événement.</span>`;
+                }
+            } catch (error) {
+                container.innerHTML = `<span class="text-muted small-text">Erreur iCal.</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

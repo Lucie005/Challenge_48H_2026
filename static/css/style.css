@@ -1,0 +1,418 @@
+/* =========================================
+   VARIABLES & GLOBALS
+========================================= */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-faint: #F3E8FF;
+  --bg-app: #F5F3FF;
+  --bg-card: #FFFFFF;
+  --text-main: #1F2937;
+  --text-muted: #6B7280;
+  --border-color: #E5E7EB;
+  --danger: #EF4444;
+  --danger-faint: #FEE2E2;
+  --radius-lg: 20px;
+  --radius-md: 12px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  /* Sur PC, on bloque le scroll du body pour scroller au centre */
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+.text-muted { color: var(--text-muted); }
+.small-text { font-size: 0.85rem; }
+
+/* =========================================
+   HEADER MOBILE (Caché sur PC)
+========================================= */
+.mobile-header {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.mobile-header .logo-y-mini {
+  width: 35px;
+  height: 35px;
+  background-color: var(--primary);
+  color: white;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.mobile-header-title {
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 1rem;
+}
+
+/* =========================================
+   SIDEBAR NAVIGATION
+========================================= */
+.sidebar {
+  width: 80px;
+  background-color: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  z-index: 100;
+}
+
+.logo-btn { width: 45px; height: 45px; background-color: var(--primary); color: white; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.5rem; text-decoration: none; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3); }
+.nav-menu { display: flex; flex-direction: column; gap: 15px; }
+.nav-icon { width: 45px; height: 45px; display: flex; justify-content: center; align-items: center; border-radius: 12px; color: var(--text-muted); text-decoration: none; font-size: 1.2rem; transition: all 0.2s; }
+.nav-icon:hover, .nav-icon.active { background-color: var(--primary-faint); color: var(--primary); }
+.nav-icon-danger { color: var(--danger) !important; }
+.nav-icon-danger:hover { background-color: var(--danger-faint) !important; color: var(--danger) !important; }
+
+.spacer { flex-grow: 1; }
+.btn-add { background-color: var(--primary); color: white; border-radius: 50%; margin-bottom: 15px; }
+.btn-add:hover { background-color: #6D28D9; color: white; }
+.profile-mini { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-faint); }
+
+.logout-pc { display: flex; }
+.logout-profile { display: none; }
+
+/* =========================================
+   MAIN LAYOUT & CARDS
+========================================= */
+.main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 25px;
+  overflow-y: auto;
+}
+
+.content-wrapper { display: flex; gap: 30px; width: 100%; max-width: 1100px; }
+.card { background-color: var(--bg-card); border-radius: var(--radius-lg); padding: 20px; border: 1px solid var(--border-color); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02); }
+.avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+
+/* =========================================
+   HOME FEED
+========================================= */
+.feed-column { flex: 2; display: flex; flex-direction: column; gap: 20px; max-width: 700px; }
+.feed-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px; }
+.feed-filters { display: flex; gap: 10px; }
+.filter-btn { border: none; background: transparent; color: var(--text-muted); font-weight: 600; cursor: pointer; padding: 5px 10px; border-radius: 20px; }
+.filter-btn.active { background-color: var(--primary); color: white; }
+
+.create-post { display: flex; align-items: flex-start; gap: 15px; padding: 15px 20px; border-radius: 20px; }
+.create-post textarea { flex: 1; border: none; outline: none; font-size: 1rem; font-family: inherit; background: transparent; resize: none; padding-top: 10px; }
+
+.post-card { display: flex; flex-direction: column; gap: 15px; }
+.post-header { display: flex; align-items: center; gap: 15px; }
+.post-meta { flex: 1; overflow: hidden; }
+.post-meta h4 { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+.badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; white-space: nowrap; }
+.badge-projet { background-color: #FCE7F3; color: #DB2777; }
+.badge-post { background-color: var(--bg-app); color: var(--text-muted); }
+.bookmark-icon { color: var(--text-muted); cursor: pointer; }
+
+.post-body p { line-height: 1.5; margin-bottom: 15px; word-wrap: break-word; }
+.post-tags { display: flex; gap: 10px; flex-wrap: wrap; }
+.tag { color: var(--primary); background-color: var(--primary-faint); padding: 5px 12px; border-radius: 15px; font-size: 0.85rem; font-weight: 500; }
+
+.post-footer { display: flex; gap: 20px; border-top: 1px solid var(--border-color); padding-top: 15px; flex-wrap: wrap; }
+.action-btn { background: transparent; border: none; color: var(--text-muted); display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.95rem; }
+.action-btn:hover { color: var(--primary); }
+
+/* =========================================
+   WIDGETS (RIGHT COLUMN)
+========================================= */
+.right-column { flex: 1; display: flex; flex-direction: column; gap: 20px; max-width: 350px; }
+.widget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.status-badge { color: var(--primary); background-color: var(--primary-faint); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+.chat-history { max-height: 200px; overflow-y: auto; margin: 15px 0; display: flex; flex-direction: column; gap: 10px; }
+.chat-msg { padding: 8px 12px; border-radius: 12px; font-size: 0.85rem; line-height: 1.4; max-width: 90%; }
+.msg-user { background-color: var(--primary-faint); color: var(--primary); align-self: flex-end; border-bottom-right-radius: 4px; }
+.msg-bot { background-color: var(--bg-app); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; }
+.chat-input-area { display: flex; border: 1px solid var(--border-color); border-radius: 20px; padding: 5px 15px; }
+.chat-input-area input { flex: 1; border: none; outline: none; background: transparent; width: 100%; }
+.send-btn { background: var(--primary-faint); color: var(--primary); border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+
+.edt-event { border-left: 3px solid var(--primary); padding-left: 10px; margin-top: 15px; }
+.events-list { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
+.event-item { display: flex; align-items: center; gap: 15px; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color); background-color: #FAFAFA; }
+.event-item i { font-size: 1.5rem; }
+.event-orange i { color: #F59E0B; }
+.event-blue i { color: #3B82F6; }
+
+/* =========================================
+   PROFILE VIEW
+========================================= */
+.profile-wrapper { flex-direction: column; }
+.profile-header-card { padding: 0; overflow: hidden; width: 100%; }
+.profile-banner { height: 150px; background: linear-gradient(135deg, var(--primary-light), var(--primary)); display: flex; justify-content: flex-end; padding: 15px; width: 100%; }
+.badge-campus-banner { background-color: rgba(255, 255, 255, 0.2); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; backdrop-filter: blur(5px); height: fit-content; display: flex; align-items: center; gap: 8px; }
+.badge-campus-banner .dot { width: 6px; height: 6px; background-color: #10B981; border-radius: 50%; }
+
+.profile-info-container { padding: 0 30px 30px 30px; }
+.profile-main-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; flex-wrap: wrap; gap: 15px; }
+.avatar-large { width: 110px; height: 110px; border-radius: 20px; object-fit: cover; border: 4px solid var(--bg-card); margin-top: -55px; background-color: white; flex-shrink: 0; }
+.profile-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+.profile-name { font-size: 1.8rem; margin-bottom: 5px; word-wrap: break-word; }
+.profile-filiere { color: var(--primary); font-size: 0.95rem; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.profile-stats { display: flex; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
+.stat-item { display: flex; flex-direction: column; }
+.stat-number { font-weight: bold; font-size: 1.2rem; }
+.profile-bio { line-height: 1.6; margin-bottom: 20px; max-width: 800px; word-wrap: break-word; }
+
+.btn-outline { border: 1px solid var(--border-color); background: transparent; padding: 8px 16px; border-radius: 20px; color: var(--text-main); font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 0.9rem; justify-content: center; }
+.btn-outline:hover { background-color: var(--bg-app); }
+.btn-outline-danger { border-color: var(--danger) !important; color: var(--danger) !important; }
+.btn-outline-danger:hover { background-color: var(--danger-faint) !important; }
+
+.profile-links { display: flex; gap: 15px; flex-wrap: wrap; }
+.link-btn { border: 1px solid var(--border-color); padding: 8px 15px; border-radius: 12px; text-decoration: none; color: var(--text-main); font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+.link-btn:hover { border-color: var(--primary-light); background-color: var(--primary-faint); }
+
+.profile-grid { display: flex; gap: 30px; margin-top: 20px; }
+.skills-card { flex: 1; min-width: 250px; }
+.publications-card { flex: 2; min-width: 250px;}
+.skills-card h3, .publications-card h3 { margin-bottom: 20px; font-size: 1.1rem; }
+.skills-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.skill-tag { background-color: var(--primary-faint); color: var(--primary); padding: 8px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 500; }
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0; gap: 15px; text-align: center; }
+.empty-state i { font-size: 2.5rem; color: #D1D5DB; }
+
+/* =========================================
+   YMATCH JOBS VIEW
+========================================= */
+.jobs-wrapper { flex-direction: column; }
+.jobs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 20px; }
+.jobs-title { display: flex; align-items: center; gap: 15px; }
+.icon-box { width: 50px; height: 50px; background-color: var(--primary-light); color: white; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; }
+.jobs-stats { display: flex; gap: 15px; flex-wrap: wrap; }
+.stat-box { background-color: white; border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 90px; }
+.stat-num { font-size: 1.2rem; font-weight: bold; }
+.text-primary { color: var(--primary); }
+.text-blue { color: #3B82F6; }
+.text-green { color: #10B981; }
+.stat-label { font-size: 0.8rem; color: var(--text-muted); }
+
+.jobs-search-bar { display: flex; align-items: center; padding: 15px 20px; gap: 15px; margin-bottom: 30px; border-radius: 16px; background-color: white; border: 1px solid var(--border-color); flex-wrap: wrap; }
+.jobs-search-bar input { flex: 1; border: none; outline: none; font-size: 1rem; background: transparent; min-width: 200px; text-overflow: ellipsis; }
+.jobs-filters { display: flex; align-items: center; gap: 10px; border-left: 1px solid var(--border-color); padding-left: 15px; flex-wrap: wrap; }
+
+.jobs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+.job-card { display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
+.job-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); }
+.job-card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+.company-logo { width: 50px; height: 50px; background-color: var(--text-main); color: white; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.2rem; flex-shrink: 0; }
+.job-meta { flex: 1; overflow: hidden; }
+.job-meta h3 { font-size: 1.1rem; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.job-tags { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+.badge-stage { background-color: #DBEAFE; color: #2563EB; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; }
+.badge-alternance { background-color: #D1FAE5; color: #059669; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; }
+
+.job-description { font-size: 0.95rem; line-height: 1.5; color: var(--text-muted); margin-bottom: 25px; flex-grow: 1; }
+.job-card-footer { margin-top: auto; }
+.btn-postuler { display: block; width: 100%; text-align: center; padding: 10px; background-color: var(--primary-light); color: white; border-radius: 12px; text-decoration: none; font-weight: bold; transition: background 0.2s; }
+.btn-postuler:hover { background-color: var(--primary); }
+
+/* =========================================
+   STUDENTS DIRECTORY VIEW
+========================================= */
+.students-wrapper { flex-direction: column; }
+.students-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 20px; }
+.students-title-area { display: flex; align-items: center; gap: 15px; }
+.icon-box-purple { width: 50px; height: 50px; background-color: var(--primary); color: white; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; flex-shrink: 0; }
+
+.students-search-bar { display: flex; align-items: center; background-color: white; padding: 10px 20px; border-radius: 30px; border: 1px solid var(--border-color); gap: 10px; flex-wrap: wrap; }
+.students-search-bar input { flex: 1; border: none; outline: none; background: transparent; font-size: 0.95rem; min-width: 150px; text-overflow: ellipsis; }
+.filter-divider { width: 1px; height: 20px; background-color: var(--border-color); margin: 0 10px; }
+.promo-select { border: none; outline: none; background: transparent; color: var(--text-main); font-size: 0.95rem; cursor: pointer; }
+
+.campus-info-bar { display: flex; align-items: center; padding: 12px 20px; margin-bottom: 30px; border-radius: 12px; flex-wrap: wrap; gap: 10px; }
+.online-status { display: flex; align-items: center; gap: 8px; color: var(--text-main); white-space: nowrap; }
+.dot-green { width: 8px; height: 8px; background-color: #10B981; border-radius: 50%; }
+.badge-campus-unique { background-color: #FCE7F3; color: #DB2777; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; white-space: nowrap; }
+
+.students-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
+.student-card { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 30px 20px; transition: transform 0.2s, box-shadow 0.2s; }
+.student-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); }
+
+.student-avatar-container { position: relative; margin-bottom: 15px; }
+.student-avatar { width: 90px; height: 90px; border-radius: 24px; object-fit: cover; }
+.online-indicator { position: absolute; bottom: -5px; right: -5px; width: 18px; height: 18px; background-color: #10B981; border: 3px solid white; border-radius: 50%; }
+
+.student-name { font-size: 1.2rem; margin-bottom: 5px; word-wrap: break-word; }
+.student-filiere { font-size: 0.85rem; color: var(--primary); background-color: var(--primary-faint); padding: 4px 10px; border-radius: 12px; margin-bottom: 15px; }
+.student-bio { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; min-height: 40px; }
+.student-skills { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 20px; }
+.skill-tag-mini { font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border-color); color: var(--text-muted); }
+
+.student-stats { display: flex; gap: 30px; margin-bottom: 25px; border-top: 1px solid var(--border-color); padding-top: 15px; width: 100%; justify-content: center; flex-wrap: wrap; }
+.stat-col { display: flex; flex-direction: column; }
+
+.student-actions { display: flex; gap: 10px; width: 100%; }
+.btn-outline-primary { background: transparent; border: 1px solid var(--primary-light); color: var(--primary); padding: 10px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+.btn-outline-primary:hover { background: var(--primary-faint); }
+.btn-icon-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); width: 40px; height: 40px; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0;}
+.btn-icon-outline:hover { color: var(--primary); border-color: var(--primary-light); }
+
+/* =========================================
+   MESSAGES VIEW
+========================================= */
+.messages-wrapper { display: flex; height: calc(100vh - 50px); background-color: white; border-radius: 24px; border: 1px solid var(--border-color); overflow: hidden; padding: 0; gap: 0; }
+.conversations-list { width: 350px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; background-color: white; }
+.conversations-header { padding: 20px; border-bottom: 1px solid var(--border-color); }
+.conversations-header h2 { font-size: 1.5rem; margin-bottom: 15px; }
+.search-chat { display: flex; align-items: center; background-color: var(--bg-app); padding: 10px 15px; border-radius: 20px; gap: 10px; }
+.search-chat input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.95rem; }
+
+.contacts-scroll { overflow-y: auto; flex: 1; }
+.contact-item { display: flex; align-items: center; padding: 15px 20px; gap: 15px; cursor: pointer; transition: background 0.2s; border-bottom: 1px solid var(--bg-app); }
+.contact-item:hover, .contact-item.active { background-color: var(--primary-faint); }
+
+.contact-avatar-box { position: relative; flex-shrink: 0; }
+.contact-avatar { width: 50px; height: 50px; border-radius: 16px; object-fit: cover; }
+.contact-online { position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background-color: #10B981; border: 2px solid white; border-radius: 50%; }
+
+.contact-info { flex: 1; overflow: hidden; }
+.contact-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.contact-name { font-weight: 600; font-size: 1rem; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.contact-time { font-size: 0.8rem; color: var(--text-muted); flex-shrink: 0; margin-left: 5px; }
+.contact-preview { font-size: 0.9rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.unread-badge { background-color: var(--primary); color: white; font-size: 0.75rem; font-weight: bold; padding: 2px 8px; border-radius: 10px; margin-left: 10px; flex-shrink: 0; }
+.chat-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #FAFAFA; }
+.empty-chat-state { text-align: center; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 20px; }
+.empty-chat-icon { width: 70px; height: 70px; background-color: var(--primary-faint); color: var(--primary); border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 2rem; transform: rotate(-10deg); }
+
+/* =========================================
+   MEDIA QUERIES (RESPONSIVE)
+========================================= */
+
+@media (max-width: 992px) {
+  .content-wrapper { flex-direction: column; gap: 20px; }
+  .feed-column, .right-column { width: 100%; max-width: 100%; }
+  .right-column { display: flex; flex-direction: row; flex-wrap: wrap; }
+  .widget { flex: 1; min-width: 280px; }
+}
+
+@media (max-width: 768px) {
+  
+  /* On redonne le pouvoir au scroll natif du téléphone */
+  body { overflow: auto; }
+  
+  .app-container { height: auto; min-height: 100vh; display: block; }
+
+  /* HEADER MOBILE */
+  .mobile-header { display: flex; }
+
+  /* SIDEBAR BASSE */
+  .sidebar {
+    width: 100%; height: 70px; flex-direction: row; justify-content: space-around;
+    padding: 0 10px; border-right: none; border-top: 1px solid var(--border-color);
+    position: fixed; bottom: 0; z-index: 1000;
+  }
+
+  .logo-btn, .spacer, .btn-add, .profile-mini { display: none; }
+  .logout-pc { display: none !important; }
+  .logout-profile { display: flex !important; } 
+
+  .nav-menu { flex-direction: row; width: 100%; justify-content: space-around; gap: 0; align-items: center; }
+  .nav-icon { width: 55px; height: 55px; font-size: 1.4rem; }
+
+  /* CONTENU PRINCIPAL */
+  .main-content {
+    padding: 15px;
+    padding-top: 70px;
+    padding-bottom: 120px;
+    overflow: visible;
+  }
+
+  .content-wrapper { gap: 15px; }
+  .card { padding: 15px; border-radius: var(--radius-md); }
+
+  /* FEED */
+  .feed-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .feed-header h2 { font-size: 1.3rem; }
+  .feed-filters { width: 100%; overflow-x: auto; padding-bottom: 5px; gap: 5px; }
+  .filter-btn { font-size: 0.85rem; padding: 4px 8px; white-space: nowrap; }
+
+  .create-post { gap: 10px; border-radius: 20px; }
+  .create-post .avatar { width: 35px; height: 35px; }
+
+  .post-card { gap: 10px; }
+  .post-header { gap: 10px; flex-wrap: wrap;}
+  .post-meta h4 { font-size: 0.95rem; }
+  .post-meta .text-muted { font-size: 0.8rem; }
+  .post-body p { font-size: 0.9rem; margin-bottom: 10px; }
+  .tag { font-size: 0.75rem; padding: 4px 10px; }
+  .post-footer { gap: 15px; padding-top: 10px; justify-content: space-around;}
+
+  /* PROFIL */
+  .profile-header-card { width: 100%; overflow: visible; display: block; } 
+  .profile-banner { height: 100px; min-height: 100px; border-radius: 12px 12px 0 0; } 
+  
+  .profile-info-container { padding: 0 15px 15px 15px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .profile-main-row { flex-direction: column; align-items: center; margin-bottom: 10px; width: 100%; }
+  .avatar-large { width: 90px; height: 90px; margin-top: -45px; border-width: 3px; }
+  .profile-actions { justify-content: center; width: 100%; margin-top: 10px; }
+  .btn-outline { width: 100%; justify-content: center; }
+  
+  .profile-name { font-size: 1.5rem; }
+  .profile-filiere { justify-content: center; }
+  .profile-stats { justify-content: center; gap: 20px; }
+  .profile-links { justify-content: center; }
+  .profile-grid { flex-direction: column; gap: 15px; }
+
+  /* JOBS */
+  .jobs-header { flex-direction: column; align-items: flex-start; }
+  .jobs-search-bar { padding: 10px; flex-direction: column; align-items: stretch; gap: 10px; }
+  .jobs-filters { border-left: none; border-top: 1px solid var(--border-color); padding: 10px 0 0 0; width: 100%; justify-content: center; }
+  .jobs-grid { grid-template-columns: 1fr; } 
+
+  /* ÉTUDIANTS */
+  .students-header { flex-direction: column; align-items: stretch; }
+  .students-search-bar { flex-direction: column; align-items: stretch; padding: 10px 15px; }
+  .filter-divider { display: none; }
+  .promo-select { padding: 10px 0; border-top: 1px solid var(--border-color); margin-top: 5px; }
+  
+  .campus-info-bar { flex-direction: column; text-align: center; gap: 8px; }
+  .campus-info-bar .text-muted:first-of-type { display: none; }
+  
+  .students-grid { grid-template-columns: 1fr; } 
+
+  /* MESSAGES */
+  .conversations-list { width: 100%; border-right: none; }
+  .chat-area { display: none; }
+  .messages-wrapper { height: auto; border-radius: 0; border: none; }
+  .contacts-scroll { overflow-y: visible; flex: none; }
+}

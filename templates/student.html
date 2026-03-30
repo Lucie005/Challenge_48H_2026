@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Y - Étudiants</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+
+    <header class="mobile-header">
+        <div class="logo-y-mini">Y</div>
+        <span class="mobile-header-title">Paris Ynov Campus</span>
+    </header>
+
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <a href="#" class="logo-btn">Y</a>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
+                <a href="profile.html" class="nav-icon" title="Profil"><i class="far fa-user"></i></a>
+                <a href="messages.html" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
+                <a href="student.html" class="nav-icon active" title="Étudiants"><i class="fas fa-user-friends"></i></a>
+                <a href="jobs.html" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
+            </nav>
+            <div class="spacer"></div>
+            <a href="#" class="nav-icon btn-add"><i class="fas fa-plus"></i></a>
+            
+            <img src="https://ui-avatars.com/api/?name=Alex+Martin&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
+            <a href="auth.html" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-wrapper students-wrapper">
+                
+                <div class="students-header">
+                    <div class="students-title-area">
+                        <div class="icon-box-purple"><i class="fas fa-user-friends"></i></div>
+                        <div>
+                            <h2>Étudiants <span class="text-muted" style="font-weight: normal;">Paris Ynov</span></h2>
+                            <p class="text-muted small-text">Connectez-vous avec vos camarades</p>
+                        </div>
+                    </div>
+
+                    <div class="students-search-bar">
+                        <i class="fas fa-search text-muted"></i>
+                        <input type="text" placeholder="Nom, compétence...">
+                        <div class="filter-divider"></div>
+                        <i class="fas fa-filter text-muted"></i>
+                        <select class="promo-select">
+                            <option value="all">Toutes promos</option>
+                            <option value="b1">B1</option>
+                            <option value="b2">B2</option>
+                            <option value="b3">B3</option>
+                            <option value="m1">Mastère 1</option>
+                            <option value="m2">Mastère 2</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="campus-info-bar card">
+                    <div class="online-status">
+                        <span class="dot-green"></span>
+                        <strong>5</strong> étudiants en ligne
+                    </div>
+                    <span class="text-muted" style="margin: 0 15px;">·</span>
+                    <span class="text-muted">Paris Ynov Campus - 10 rue Brancion, 75015</span>
+                    <div class="spacer"></div>
+                    <span class="badge badge-campus-unique">Campus unique 🗼</span>
+                </div>
+
+                <div class="students-grid">
+                    {% for student in students %}
+                    <div class="card student-card">
+                        <div class="student-avatar-container">
+                            <img src="https://ui-avatars.com/api/?name={{ student.username | replace(' ', '+') }}&background=E5E7EB&color=1F2937&size=128" alt="{{ student.username }}" class="student-avatar">
+                            <div class="online-indicator"></div>
+                        </div>
+
+                        <h3 class="student-name">{{ student.username }}</h3>
+                        <span class="student-filiere"><i class="fas fa-book-open"></i> {{ student.filiere }}</span>
+
+                        <p class="student-bio">
+                            {{ student.bio | truncate(70, true, '...') }}
+                        </p>
+
+                        <div class="student-skills">
+                            {% for skill in student.skills[:3] %}
+                                <span class="skill-tag-mini">{{ skill.nom }}</span>
+                            {% endfor %}
+                            {% if student.skills|length > 3 %}
+                                <span class="skill-tag-mini">+{{ student.skills|length - 3 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="student-stats">
+                            <div class="stat-col">
+                                <strong>{{ student.followers_count | default(0) }}</strong>
+                                <span class="text-muted small-text">abonnés</span>
+                            </div>
+                            <div class="stat-col">
+                                <strong>{{ student.following_count | default(0) }}</strong>
+                                <span class="text-muted small-text">abonnements</span>
+                            </div>
+                        </div>
+
+                        <div class="student-actions">
+                            <a href="profile.html" class="btn-outline-primary" style="flex: 1;"><i class="fas fa-user"></i> Voir Profil</a>
+                            <button class="btn-icon-outline"><i class="far fa-comment"></i></button>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="card student-card">
+                        <div class="student-avatar-container">
+                            <img src="https://ui-avatars.com/api/?name=Sophie+Dubois&background=E5E7EB&size=128" alt="Sophie" class="student-avatar">
+                            <div class="online-indicator"></div>
+                        </div>
+                        <h3 class="student-name">Sophie Dubois</h3>
+                        <span class="student-filiere"><i class="fas fa-book-open"></i> M1 Design</span>
+                        <p class="student-bio">Designeuse UX/UI passionnée par l'accessibilité.</p>
+                        <div class="student-skills">
+                            <span class="skill-tag-mini">Figma</span>
+                            <span class="skill-tag-mini">React</span>
+                            <span class="skill-tag-mini">CSS</span>
+                        </div>
+                        <div class="student-stats">
+                            <div class="stat-col"><strong>256</strong><span class="text-muted small-text">abonnés</span></div>
+                            <div class="stat-col"><strong>142</strong><span class="text-muted small-text">abonnements</span></div>
+                        </div>
+                        <div class="student-actions">
+                            <a href="profile.html" class="btn-outline-primary" style="flex: 1;"><i class="fas fa-user"></i> Voir Profil</a>
+                            <button class="btn-icon-outline"><i class="far fa-comment"></i></button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,215 @@
+/* =========================================
+   VARIABLES & RESET
+========================================= */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --bg-app: #F5F3FF;
+  --text-main: #1F2937;
+  --text-muted: #6B7280;
+  --border-color: #E5E7EB;
+  --input-bg: #FCFBFF;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* =========================================
+   LAYOUT
+========================================= */
+body {
+  background: radial-gradient(circle at center, #FFFFFF 0%, #EBE4FF 100%);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+.auth-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.logo-y {
+  width: 60px;
+  height: 60px;
+  background-color: var(--primary-light);
+  color: white;
+  border-radius: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 2rem;
+  margin: 0 auto 15px auto;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+}
+
+.auth-header h1 {
+  font-size: 1.8rem;
+  color: var(--text-main);
+  margin-bottom: 10px;
+}
+
+.badge-campus {
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba(124, 58, 237, 0.1);
+  color: var(--primary);
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.badge-campus .dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+/* =========================================
+   COMPONENTS
+========================================= */
+.auth-card {
+  background-color: white;
+  width: 100%;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+}
+
+.tabs {
+  display: flex;
+  background-color: var(--input-bg);
+  border-radius: 12px;
+  padding: 5px;
+  margin-bottom: 25px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tab-btn.active {
+  background-color: var(--primary-light);
+  color: white;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+}
+
+/* =========================================
+   FORMS
+========================================= */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-group i {
+  position: absolute;
+  left: 15px;
+  color: var(--primary-light);
+}
+
+.input-group .toggle-password {
+  left: auto;
+  right: 15px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.input-group input, 
+.input-group select {
+  width: 100%;
+  padding: 14px 14px 14px 45px;
+  border: 1px solid var(--primary-light);
+  border-radius: 12px;
+  background-color: var(--input-bg);
+  font-size: 0.95rem;
+  color: var(--text-main);
+  outline: none;
+  transition: border 0.3s;
+  appearance: none;
+}
+
+.input-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.input-group input:focus, 
+.input-group select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--primary-light);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.auth-footer {
+  margin-top: 30px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+}

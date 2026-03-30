@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Y - Messagerie</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+
+    <header class="mobile-header">
+        <div class="logo-y-mini">Y</div>
+        <span class="mobile-header-title">Paris Ynov Campus</span>
+    </header>
+
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <a href="#" class="logo-btn">Y</a>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
+                <a href="profile.html" class="nav-icon" title="Profil"><i class="far fa-user"></i></a>
+                <a href="messages.html" class="nav-icon active" title="Messages"><i class="far fa-comment-dots"></i></a>
+                <a href="student.html" class="nav-icon" title="Étudiants"><i class="fas fa-user-friends"></i></a>
+                <a href="jobs.html" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
+            </nav>
+            <div class="spacer"></div>
+            <a href="#" class="nav-icon btn-add"><i class="fas fa-plus"></i></a>
+            
+            <img src="https://ui-avatars.com/api/?name=Alex+Martin&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
+            <a href="auth.html" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-wrapper messages-wrapper">
+                
+                <div class="conversations-list">
+                    <div class="conversations-header">
+                        <h2>Messages</h2>
+                        <div class="search-chat">
+                            <i class="fas fa-search text-muted"></i>
+                            <input type="text" placeholder="Rechercher...">
+                        </div>
+                    </div>
+
+                    <div class="contacts-scroll">
+                        {% for conversation in conversations %}
+                        <div class="contact-item">
+                            <div class="contact-avatar-box">
+                                <img src="https://ui-avatars.com/api/?name={{ conversation.user.username | replace(' ', '+') }}&background=E5E7EB&color=1F2937&size=50" alt="Avatar" class="contact-avatar">
+                                {% if conversation.user.is_online %}
+                                    <div class="contact-online"></div>
+                                {% endif %}
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-top">
+                                    <span class="contact-name">{{ conversation.user.username }}</span>
+                                    <span class="contact-time">{{ conversation.last_message.sent_at.strftime('%H:%M') }}</span>
+                                </div>
+                                <div class="contact-top" style="margin:0;">
+                                    <span class="contact-preview">{{ conversation.last_message.body }}</span>
+                                    {% if not conversation.last_message.is_read %}
+                                        <span class="unread-badge">1</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        
+                        <div class="contact-item active">
+                            <div class="contact-avatar-box">
+                                <img src="https://ui-avatars.com/api/?name=Sophie+Dubois&background=E5E7EB&color=1F2937&size=50" alt="Sophie" class="contact-avatar">
+                                <div class="contact-online"></div>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-top">
+                                    <span class="contact-name">Sophie Dubois</span>
+                                    <span class="contact-time">Hier</span>
+                                </div>
+                                <div class="contact-top" style="margin:0;">
+                                    <span class="contact-preview" style="color: var(--text-main); font-weight: 500;">Exactement ! On se retrouve...</span>
+                                    <span class="unread-badge">1</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-avatar-box">
+                                <img src="https://ui-avatars.com/api/?name=Lucas+Bernard&background=E5E7EB&color=1F2937&size=50" alt="Lucas" class="contact-avatar">
+                                <div class="contact-online"></div>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-top">
+                                    <span class="contact-name">Lucas Bernard</span>
+                                    <span class="contact-time">Hier</span>
+                                </div>
+                                <div class="contact-top" style="margin:0;">
+                                    <span class="contact-preview" style="color: var(--text-main); font-weight: 500;">Merci ! Tu veux rejoindre l'é...</span>
+                                    <span class="unread-badge">1</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-avatar-box">
+                                <img src="https://ui-avatars.com/api/?name=Nathan+Girard&background=7C3AED&color=fff&size=50" alt="Nathan" class="contact-avatar">
+                                <div class="contact-online"></div>
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-top">
+                                    <span class="contact-name">Nathan Girard</span>
+                                    <span class="contact-time">27 mars</span>
+                                </div>
+                                <div class="contact-top" style="margin:0;">
+                                    <span class="contact-preview">Vous : Bonjour Nathan ! C'est int...</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="chat-area">
+                    <div class="empty-chat-state">
+                        <div class="empty-chat-icon">
+                            <i class="far fa-paper-plane"></i>
+                        </div>
+                        <h3>Sélectionnez une conversation</h3>
+                        <p>Échangez avec vos camarades de Paris Ynov</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

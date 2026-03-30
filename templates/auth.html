@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Y - Authentification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="logo-y">Y</div>
+            <div class="badge-campus">
+                <span class="dot"></span> Paris Ynov Campus
+            </div>
+        </div>
+
+        <div class="auth-card">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Connexion</button>
+                <button class="tab-btn" onclick="switchTab('register')">Inscription</button>
+            </div>
+
+            <form id="form-login" class="auth-form active-form" action="/login" method="POST">
+                <div class="input-group">
+                    <i class="far fa-envelope"></i>
+                    <input type="email" name="email" placeholder="prenom.nom@ynov.com" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="Mot de passe" required>
+                    <i class="far fa-eye toggle-password"></i>
+                </div>
+                <button type="submit" class="btn-primary">Se connecter <i class="fas fa-arrow-right"></i></button>
+            </form>
+
+            <form id="form-register" class="auth-form" action="/register" method="POST" style="display: none;">
+                <div class="input-group">
+                    <i class="far fa-user"></i>
+                    <input type="text" name="username" placeholder="Prénom Nom" required>
+                </div>
+                <div class="input-group">
+                    <i class="far fa-envelope"></i>
+                    <input type="email" name="email" placeholder="prenom.nom@ynov.com" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="Mot de passe" required>
+                    <i class="far fa-eye toggle-password"></i>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="confirm_password" placeholder="Confirmer le mot de passe" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-book-open"></i>
+                    <select name="filiere" required>
+                        <option value="" disabled selected>Sélectionner votre promo</option>
+                        <option value="B1 Informatique">B1 Informatique</option>
+                        <option value="B2 Informatique">B2 Informatique</option>
+                        <option value="B1 Création & Digital Design">B1 Création & Digital Design</option>
+                        <option value="B2 Création & Digital Design">B2 Création & Digital Design</option>
+                        <option value="B1 Marketing">B1 Marketing</option>
+                        <option value="B2 Cybersécurité">B2 Cybersécurité</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Créer mon compte <i class="fas fa-arrow-right"></i></button>
+            </form>
+        </div>
+
+        <div class="auth-footer">
+            Réservé aux étudiants de Paris Ynov Campus
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            const loginForm = document.getElementById('form-login');
+            const registerForm = document.getElementById('form-register');
+            const tabs = document.querySelectorAll('.tab-btn');
+
+            if (tab === 'login') {
+                loginForm.style.display = 'flex';
+                registerForm.style.display = 'none';
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'flex';
+                tabs[0].classList.remove('active');
+                tabs[1].classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
