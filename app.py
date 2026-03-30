@@ -6,10 +6,10 @@ app = Flask(__name__)
 
 # --- CONFIGURATION MYSQL ---
 # Remplace 'root', 'ton_mdp' et 'ynov_social' par tes vrais identifiants MySQL
-DB_USER = ""
-DB_PASSWORD = ""
-DB_HOST = ""
-DB_NAME = ""
+DB_USER = "root"
+DB_PASSWORD = "Admin123!" # Mets ton mot de passe ici (souvent vide sur XAMPP)
+DB_HOST = "127.0.0.1:3307" # Ton SQL indique le port 3307
+DB_NAME = "ynov_social"
 
 # On utilise mysql+pymysql pour la compatibilité avec SQLAlchemy
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
@@ -32,6 +32,8 @@ with app.app_context():
         )
         admin.set_password('Admin123!')
         admin.can_moderate = True  # L'admin possède les droits par défaut
+        # Forcer le type car l'admin est un Staff
+        admin.user_type = 'staff'
         db.session.add(admin)
         db.session.commit()
 
@@ -83,14 +85,14 @@ def register():
     db.session.add(new_user)
     db.session.commit()
     
-    # Si c'est un staff qui demande la modération, on envoie un message à l'admin
+    # Demande de modération : envoi d'un message interne à l'admin
     if user_type == 'staff' and 'request_moderation' in data:
         admin_account = User.query.filter_by(username='admin').first()
         if admin_account:
             demande_msg = Message(
                 sender_id=new_user.id,
                 receiver_id=admin_account.id,
-                body=f"L'utilisateur {new_user.username} souhaite obtenir les droits de modération."
+                body=f"DEMANDE DE MODÉRATION : L'utilisateur {new_user.username} (ID: {new_user.id}) sollicite les droits."
             )
             db.session.add(demande_msg)
             db.session.commit()

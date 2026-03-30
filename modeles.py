@@ -6,11 +6,11 @@ db = SQLAlchemy()
 
 # --- CLASSE MÈRE ---
 class User(db.Model):
-    __tablename__ = 'user'
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    _password_hash = db.Column(db.String(255), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Système d'héritage (Polymorphisme)
@@ -21,10 +21,10 @@ class User(db.Model):
     }
 
     def set_password(self, password):
-        self._password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self._password_hash, password)
+        return check_password_hash(self.password_hash, password)
 
     def get_avatar(self):
         return f"https://ui-avatars.com/api/?name={self.username}&background=random"
@@ -32,18 +32,20 @@ class User(db.Model):
 # --- CLASSES FILLES ---
 class Student(User):
     __tablename__ = 'student'
-    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    campus_id = db.Column(db.Integer, db.ForeignKey('campus.id'))
     filiere = db.Column(db.String(50))
     skills = db.Column(db.Text)
     is_searching_job = db.Column(db.Boolean, default=False)
-    Edt = db.Column(db.String(100))
+    edt = db.Column(db.String(100))
     bio = db.Column(db.Text)
 
     __mapper_args__ = {'polymorphic_identity': 'student'}
 
 class StaffYnov(User):
     __tablename__ = 'staff'
-    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    campus_id = db.Column(db.Integer, db.ForeignKey('campus.id'))
     role_title = db.Column(db.String(100))
     can_moderate = db.Column(db.Boolean, default=False)
 
@@ -51,7 +53,7 @@ class StaffYnov(User):
 
 class ExternalUser(User):
     __tablename__ = 'external_user' 
-    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     organization = db.Column(db.String(100)) # Entreprise ou asso si il y en a une
     description = db.Column(db.String(255)) # Pourquoi ils sont là
 
@@ -60,18 +62,19 @@ class ExternalUser(User):
 # --- AUTRES CLASSES ---
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     content = db.Column(db.Text)
     media_url = db.Column(db.String(255))
     media_type = db.Column(db.String(20), default='text') # text, image, video
     is_reel = db.Column(db.Boolean, default=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    author = db.relationship('User', backref='posts')
+    author = db.relationship('User', backref='posts', foreign_keys=[author_id])
 
 class Message(db.Model):
+    __tablename__ = 'messages'
     id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     body = db.Column(db.Text, nullable=False)
     is_read = db.Column(db.Boolean, default=False)
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
