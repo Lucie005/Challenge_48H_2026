@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - Ynov Social</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h2 { color: #0056b3; text-align: center; margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: #333; }
+        input, select, textarea { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .hidden { display: none; }
+        .dynamic-section { border-left: 4px solid #0056b3; padding-left: 1rem; margin-top: 1rem; background: #f9f9f9; padding-top: 1rem; padding-bottom: 1rem; }
+        button { width: 100%; padding: 1rem; background-color: #0056b3; color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; margin-top: 1rem; }
+        button:hover { background-color: #004494; }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; }
+        .checkbox-group input { width: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Inscription</h2>
+        <form action="/register" method="POST">
+            <!-- Infos Communes (Table User) -->
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" name="username" required placeholder="ex: jdupont">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="ex: jean.dupont@ynov.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="user_type">Je suis :</label>
+                <select id="user_type" name="user_type" onchange="toggleFields()">
+                    <option value="student">Étudiant</option>
+                    <option value="staff">Staff Ynov</option>
+                    <option value="external">Externe / Entreprise</option>
+                </select>
+            </div>
+
+            <!-- Champs spécifiques Étudiant -->
+            <div id="student_fields" class="dynamic-section">
+                <div class="form-group">
+                    <label for="filiere">Filière</label>
+                    <input type="text" name="filiere" placeholder="ex: Informatique, Design...">
+                </div>
+                <div class="form-group">
+                    <label for="skills">Compétences</label>
+                    <textarea name="skills" rows="2" placeholder="Python, Photoshop..."></textarea>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" name="is_searching_job" id="is_searching_job">
+                    <label for="is_searching_job">En recherche d'alternance/stage ?</label>
+                </div>
+                <div class="form-group">
+                    <label for="Edt">Lien Emploi du Temps</label>
+                    <input type="text" name="Edt" placeholder="Lien vers votre planning">
+                </div>
+                <div class="form-group">
+                    <label for="bio">Bio</label>
+                    <textarea name="bio" rows="2"></textarea>
+                </div>
+            </div>
+
+            <!-- Champs spécifiques Staff -->
+            <div id="staff_fields" class="dynamic-section hidden">
+                <div class="form-group">
+                    <label for="role_title">Poste / Titre</label>
+                    <input type="text" name="role_title" placeholder="ex: Responsable Pédagogique">
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" name="
+            </div>
+
+            <!-- Champs spécifiques Externes -->
+            <div id="external_fields" class="dynamic-section hidden">
+                <div class="form-group">
+                    <label for="organization">Organisation / Entreprise</label>
+                    <input type="text" name="organization">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea name="description" rows="2" placeholder="Pourquoi rejoignez-vous le réseau ?"></textarea>
+                </div>
+            </div>
+
+            <button type="submit">Créer mon compte</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleFields() {
+            const type = document.getElementById('user_type').value;
+            document.getElementById('student_fields').classList.add('hidden');
+            document.getElementById('staff_fields').classList.add('hidden');
+            document.getElementById('external_fields').classList.add('hidden');
+
+            if (type === 'student') {
+                document.getElementById('student_fields').classList.remove('hidden');
+            } else if (type === 'staff') {
+                document.getElementById('staff_fields').classList.remove('hidden');
+            } else if (type === 'external') {
+                document.getElementById('external_fields').classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

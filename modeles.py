@@ -45,7 +45,7 @@ class StaffYnov(User):
     __tablename__ = 'staff'
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     role_title = db.Column(db.String(100))
-    can_moderate = db.Column(db.Boolean, default=True)
+    can_moderate = db.Column(db.Boolean, default=False)
 
     __mapper_args__ = {'polymorphic_identity': 'staff'}
 
