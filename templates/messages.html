@@ -142,14 +142,21 @@
         async function loadConversation(userId, username) {
             currentPartnerId = userId;
             const chatWindow = document.getElementById('chat-window');
+            document.querySelector('.messages-wrapper').classList.add('show-chat');
             
             // Mettre à jour l'UI vers l'état de chargement
             chatWindow.innerHTML = `
-                <div class="conversations-header"><h3>Chat avec ${username}</h3></div>
+                <div class="chat-header">
+                    <div class="chat-header-user">
+                        <img src="https://ui-avatars.com/api/?name=${username.replace(' ', '+')}&background=7C3AED&color=fff" style="width:35px; height:35px; border-radius:8px;">
+                        <h3>${username}</h3>
+                    </div>
+                    <a href="/profile/${userId}" class="btn-outline" style="font-size:0.8rem; text-decoration:none;">Profil</a>
+                </div>
                 <div class="chat-history" id="msg-container" style="flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
                     <p class="text-muted">Chargement des messages...</p>
                 </div>
-                <div class="chat-input-area" style="padding:15px; background:white; border-top:1px solid var(--border-color); display:flex; gap:10px;">
+                <div class="chat-input-area">
                     <input type="text" id="new-msg-input" placeholder="Votre message..." style="flex:1; border:none; outline:none;" onkeypress="if(event.key==='Enter') sendMessage()">
                     <button class="send-btn" onclick="sendMessage()"><i class="far fa-paper-plane"></i></button>
                 </div>
