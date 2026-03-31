@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Y - Profil</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
@@ -16,18 +16,18 @@
 
     <div class="app-container">
         <aside class="sidebar">
-            <a href="#" class="logo-btn">Y</a>
+            <a href="{{ url_for('home') }}" class="logo-btn">Y</a>
             <nav class="nav-menu">
-                <a href="index.html" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
-                <a href="profile.html" class="nav-icon active" title="Profil"><i class="far fa-user"></i></a>
-                <a href="messages.html" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
-                <a href="student.html" class="nav-icon" title="Étudiants"><i class="fas fa-user-friends"></i></a>
-                <a href="jobs.html" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
+                <a href="{{ url_for('home') }}" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
+                <a href="{{ url_for('profile') }}" class="nav-icon active" title="Profil"><i class="far fa-user"></i></a>
+                <a href="{{ url_for('messages') }}" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
+                <a href="{{ url_for('students_directory') }}" class="nav-icon" title="Étudiants"><i class="fas fa-user-friends"></i></a>
+                <a href="{{ url_for('jobs') }}" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
             </nav>
             <div class="spacer"></div>
             <a href="#" class="nav-icon btn-add"><i class="fas fa-plus"></i></a>
             <img src="https://ui-avatars.com/api/?name=Alex+Martin&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
-            <a href="auth.html" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
+            <a href="{{ url_for('logout') }}" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
         </aside>
 
         <main class="main-content">
@@ -43,7 +43,7 @@
                             <img src="https://ui-avatars.com/api/?name={{ user.username | default('Alex Martin') | replace(' ', '+') }}&background=7C3AED&color=fff&size=128" alt="Photo de profil" class="avatar-large">                            
                             <div class="profile-actions">
                                 <a href="#" class="btn-outline"><i class="fas fa-pen"></i> Modifier</a>
-                                <a href="auth.html" class="btn-outline btn-outline-danger logout-profile"><i class="fas fa-sign-out-alt"></i> Quitter</a>
+                                <a href="{{ url_for('logout') }}" class="btn-outline btn-outline-danger logout-profile"><i class="fas fa-sign-out-alt"></i> Quitter</a>
                             </div>
                         </div>
 

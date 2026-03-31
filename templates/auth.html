@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Y - Authentification</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../static/css/auth.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 </head>
 <body>
     <div class="auth-container">
@@ -22,7 +22,7 @@
                 <button class="tab-btn" onclick="switchTab('register')">Inscription</button>
             </div>
 
-            <form id="form-login" class="auth-form active-form" action="/login" method="POST">
+            <form id="form-login" class="auth-form active-form" action="{{ url_for('login') }}" method="POST">
                 <div class="input-group">
                     <i class="far fa-envelope"></i>
                     <input type="email" name="email" placeholder="prenom.nom@ynov.com" required>
@@ -35,7 +35,7 @@
                 <button type="submit" class="btn-primary">Se connecter <i class="fas fa-arrow-right"></i></button>
             </form>
 
-            <form id="form-register" class="auth-form" action="/register" method="POST" style="display: none;">
+            <form id="form-register" class="auth-form" action="{{ url_for('register') }}" method="POST" style="display: none;">
                 <div class="input-group">
                     <i class="far fa-user"></i>
                     <input type="text" name="username" placeholder="Prénom Nom" required>
@@ -54,17 +54,78 @@
                     <input type="password" name="confirm_password" placeholder="Confirmer le mot de passe" required>
                 </div>
                 <div class="input-group">
-                    <i class="fas fa-book-open"></i>
-                    <select name="filiere" required>
-                        <option value="" disabled selected>Sélectionner votre promo</option>
-                        <option value="B1 Informatique">B1 Informatique</option>
-                        <option value="B2 Informatique">B2 Informatique</option>
-                        <option value="B1 Création & Digital Design">B1 Création & Digital Design</option>
-                        <option value="B2 Création & Digital Design">B2 Création & Digital Design</option>
-                        <option value="B1 Marketing">B1 Marketing</option>
-                        <option value="B2 Cybersécurité">B2 Cybersécurité</option>
+                    <i class="fas fa-user-tag"></i>
+                    <select name="user_type" id="user_type" onchange="toggleUserFields()" required>
+                        <option value="student" selected>Je suis Étudiant</option>
+                        <option value="staff">Je suis Staff / Intervenant</option>
+                        <option value="external">Je suis Externe / Entreprise</option>
                     </select>
                 </div>
+
+                <div id="campus-group" class="input-group">
+                    <i class="fas fa-university"></i>
+                    <select name="campus_id">
+                        <option value="" disabled selected>Mon Campus</option>
+                        <option value="1">Paris Ynov Campus</option>
+                        <option value="2">Lyon Ynov Campus</option>
+                        <option value="3">Nanterre Ynov Campus</option>
+                    </select>
+                </div>
+
+                <!-- Champs spécifiques Étudiants -->
+                <div id="student-specific" style="width: 100%;">
+                    <div class="input-group">
+                        <i class="fas fa-book-open"></i>
+                        <select name="filiere">
+                            <option value="" disabled selected>Ma Promo</option>
+                            <option value="B1 Informatique">B1 Informatique</option>
+                            <option value="B2 Informatique">B2 Informatique</option>
+                            <option value="B3 Informatique">B3 Informatique</option>
+                            <option value="M1 Informatique">M1 Informatique</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-code"></i>
+                        <input type="text" name="skills" placeholder="Compétences (Python, Design...)">
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-info-circle"></i>
+                        <input type="text" name="bio" placeholder="Ma petite bio">
+                    </div>
+                    <div class="input-group">
+                        <i class="far fa-calendar-alt"></i>
+                        <input type="text" name="edt" placeholder="Lien iCal (Emploi du temps)">
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px; padding:10px; font-size:0.9rem; color: #6B7280;">
+                        <input type="checkbox" name="is_searching_job" id="is_searching_job">
+                        <label for="is_searching_job">En recherche active de stage/alternance</label>
+                    </div>
+                </div>
+
+                <!-- Champs spécifiques Staff -->
+                <div id="staff-specific" style="display:none; width: 100%;">
+                    <div class="input-group">
+                        <i class="fas fa-briefcase"></i>
+                        <input type="text" name="role_title" placeholder="Rôle (ex: Coordinateur, Intervenant)">
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px; padding:10px; font-size:0.9rem; color: #6B7280;">
+                        <input type="checkbox" name="request_moderation" id="request_moderation">
+                        <label for="request_moderation">Demander l'accès modérateur</label>
+                    </div>
+                </div>
+
+                <!-- Champs spécifiques Externes -->
+                <div id="external-specific" style="display:none; width: 100%;">
+                    <div class="input-group">
+                        <i class="fas fa-building"></i>
+                        <input type="text" name="organization" placeholder="Nom de l'entreprise">
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-align-left"></i>
+                        <input type="text" name="description" placeholder="Description courte">
+                    </div>
+                </div>
+
                 <button type="submit" class="btn-primary">Créer mon compte <i class="fas fa-arrow-right"></i></button>
             </form>
         </div>
@@ -92,6 +153,23 @@
                 tabs[1].classList.add('active');
             }
         }
+
+        function toggleUserFields() {
+            const type = document.getElementById('user_type').value;
+            const studentSection = document.getElementById('student-specific');
+            const staffSection = document.getElementById('staff-specific');
+            const externalSection = document.getElementById('external-specific');
+            const campusGroup = document.getElementById('campus-group');
+
+            studentSection.style.display = type === 'student' ? 'block' : 'none';
+            staffSection.style.display = type === 'staff' ? 'block' : 'none';
+            externalSection.style.display = type === 'external' ? 'block' : 'none';
+            
+            // Le campus n'est pertinent que pour les étudiants et le staff interne
+            campusGroup.style.display = (type === 'student' || type === 'staff') ? 'flex' : 'none';
+        }
+        
+        window.addEventListener('DOMContentLoaded', toggleUserFields);
     </script>
 </body>
 </html>
