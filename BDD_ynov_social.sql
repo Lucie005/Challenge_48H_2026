@@ -2,7 +2,7 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Hôte : 127.0.0.1:3307
+-- Hôte : 127.0.0.1:3306
 -- Généré le : lun. 30 mars 2026 à 12:32
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
@@ -309,6 +309,8 @@ CREATE TABLE `posts` (
   `media_url` varchar(255) DEFAULT NULL,
   `media_type` enum('text','image','video') DEFAULT 'text',
   `is_reel` tinyint(1) DEFAULT 0,
+  `is_projet` tinyint(1) DEFAULT 0,
+  `is_recherche` tinyint(1) DEFAULT 0,
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -316,16 +318,16 @@ CREATE TABLE `posts` (
 -- Déchargement des données de la table `posts`
 --
 
-INSERT INTO `posts` (`id`, `author_id`, `content`, `media_url`, `media_type`, `is_reel`, `created_at`) VALUES
-(1, 1, 'Je cherche un designer pour mon appli de covoiturage entre campus Ynov 🚗 On est sur Paris Ouest mais on code pour toute la France !', NULL, 'text', 0, '2026-03-30 11:48:13'),
-(2, 2, 'Ma maquette Figma pour le Challenge 48h est prête ! Interface inspirée de Dribbble 🎨', NULL, 'image', 0, '2026-03-30 11:48:13'),
-(3, 3, 'Salut depuis Lyon ! Quelqu un connait des bons spots pour coder la nuit ? 🧑‍💻', NULL, 'text', 0, '2026-03-30 11:48:13'),
-(4, 4, 'TOP 3 des erreurs marketing que font les étudiants sur leur CV 👇 Thread :', NULL, 'text', 0, '2026-03-30 11:48:13'),
-(5, 5, 'J ai trouvé une faille XSS sur un site public et je l ai signalée responsablement 🔐 La cybersécurité c est pas que l attaque !', NULL, 'text', 0, '2026-03-30 11:48:13'),
-(6, 6, 'Mon premier jeu Unity est jouable ! C est un platformer 2D basique mais je suis trop fier 🎮', NULL, 'video', 1, '2026-03-30 11:48:13'),
-(7, 7, 'Mon court-métrage tourné au campus de Nantes est en ligne ! 6 minutes, 3 jours de tournage 🎬', NULL, 'video', 0, '2026-03-30 11:48:13'),
-(8, 8, 'La soirée BDE de fin d année est confirmée ! Save the date : 15 juin 🎉 Tous les campus sont invités !', NULL, 'text', 0, '2026-03-30 11:48:13'),
-(9, 1, 'Rappel : réunion équipe Challenge 48h ce soir 20h sur Discord ! On finalise la démo 🎯', NULL, 'text', 0, '2026-03-30 11:48:13');
+INSERT INTO `posts` (`id`, `author_id`, `content`, `media_url`, `media_type`, `is_reel`, `is_projet`, `is_recherche`, `created_at`) VALUES
+(1, 1, 'Je cherche un designer pour mon appli de covoiturage entre campus Ynov 🚗 On est sur Paris Ouest mais on code pour toute la France !', NULL, 'text', 0, 0, 0, '2026-03-30 11:48:13'),
+(2, 2, 'Ma maquette Figma pour le Challenge 48h est prête ! Interface inspirée de Dribbble 🎨', NULL, 'image', 0, 1, 0, '2026-03-30 11:48:13'),
+(3, 3, 'Salut depuis Lyon ! Quelqu un connait des bons spots pour coder la nuit ? 🧑‍💻', NULL, 'text', 0, 0, 0, '2026-03-30 11:48:13'),
+(4, 4, 'TOP 3 des erreurs marketing que font les étudiants sur leur CV 👇 Thread :', NULL, 'text', 0, 0, 0, '2026-03-30 11:48:13'),
+(5, 5, 'J ai trouvé une faille XSS sur un site public et je l ai signalée responsablement 🔐 La cybersécurité c est pas que l attaque !', NULL, 'text', 0, 0, 0, '2026-03-30 11:48:13'),
+(6, 6, 'Mon premier jeu Unity est jouable ! C est un platformer 2D basique mais je suis trop fier 🎮', NULL, 'video', 1, 1, 0, '2026-03-30 11:48:13'),
+(7, 7, 'Mon court-métrage tourné au campus de Nantes est en ligne ! 6 minutes, 3 jours de tournage 🎬', NULL, 'video', 0, 1, 0, '2026-03-30 11:48:13'),
+(8, 8, 'La soirée BDE de fin d année est confirmée ! Save the date : 15 juin 🎉 Tous les campus sont invités !', NULL, 'text', 0, 0, 0, '2026-03-30 11:48:13'),
+(9, 1, 'Rappel : réunion équipe Challenge 48h ce soir 20h sur Discord ! On finalise la démo 🎯', NULL, 'text', 0, 0, 0, '2026-03-30 11:48:13');
 
 -- --------------------------------------------------------
 
@@ -450,7 +452,6 @@ CREATE TABLE `student` (
   `id` int(11) NOT NULL,
   `campus_id` int(11) DEFAULT NULL,
   `filiere` varchar(100) DEFAULT NULL,
-  `bio` text DEFAULT NULL,
   `is_searching_job` tinyint(1) DEFAULT 0,
   `skills` text DEFAULT NULL,
   `edt` varchar(255) DEFAULT NULL
@@ -460,14 +461,14 @@ CREATE TABLE `student` (
 -- Déchargement des données de la table `student`
 --
 
-INSERT INTO `student` (`id`, `campus_id`, `filiere`, `bio`, `is_searching_job`, `skills`, `edt`) VALUES
-(1, 1, 'Informatique B2', 'Dev full-stack passionné à Paris Ouest 🚀 Je cherche toujours un projet cool', 0, NULL, NULL),
-(2, 1, 'Création & Digital Design B2', 'UX/UI designer, je transforme vos idées en interfaces qui claquent ✨', 0, NULL, NULL),
-(3, 3, 'Informatique B1', 'Etudiant à Lyon, nouveau sur le campus, je cherche une équipe 👋', 0, NULL, NULL),
-(4, 4, 'Marketing & Communication Digitale B1', 'Community manager en devenir à Bordeaux 📈', 1, NULL, NULL),
-(5, 1, 'Cybersécurité B2', 'Passionné de sécu et d IA à Paris Ouest 🤖 Je code même le week-end', 0, NULL, NULL),
-(6, 5, 'Animation 3D & Jeux Vidéo B1', 'Game designer en herbe à Toulouse 🎮 Je crée mes premiers jeux Unity', 1, NULL, NULL),
-(7, 6, 'Audiovisuel B2', 'Réalisateur en devenir à Nantes 🎬 Spécialisé motion design', 0, NULL, NULL);
+INSERT INTO `student` (`id`, `campus_id`, `filiere`, `is_searching_job`, `skills`, `edt`) VALUES
+(1, 1, 'Informatique B2', 0, NULL, NULL),
+(2, 1, 'Création & Digital Design B2', 0, NULL, NULL),
+(3, 3, 'Informatique B1', 0, NULL, NULL),
+(4, 4, 'Marketing & Communication Digitale B1', 1, NULL, NULL),
+(5, 1, 'Cybersécurité B2', 0, NULL, NULL),
+(6, 5, 'Animation 3D & Jeux Vidéo B1', 1, NULL, NULL),
+(7, 6, 'Audiovisuel B2', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -481,6 +482,7 @@ CREATE TABLE `users` (
   `email` varchar(150) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
   `user_type` enum('student','staff') DEFAULT 'student',
+  `bio` text DEFAULT NULL,
   `photo` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -489,16 +491,16 @@ CREATE TABLE `users` (
 -- Déchargement des données de la table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `user_type`, `photo`, `created_at`) VALUES
-(1, 'axel.moreau', 'axel@ynov.com', 'hash123', 'student', 'axel.jpg', '2026-03-30 11:48:13'),
-(2, 'lea.chen', 'lea@ynov.com', 'hash456', 'student', 'lea.jpg', '2026-03-30 11:48:13'),
-(3, 'youssef.diallo', 'youssef@ynov.com', 'hash789', 'student', 'youssef.jpg', '2026-03-30 11:48:13'),
-(4, 'camille.petit', 'camille@ynov.com', 'hash000', 'student', 'camille.jpg', '2026-03-30 11:48:13'),
-(5, 'thomas.nguyen', 'thomas@ynov.com', 'hashabc', 'student', 'thomas.jpg', '2026-03-30 11:48:13'),
-(6, 'sofia.martin', 'sofia@ynov.com', 'hashsof', 'student', 'sofia.jpg', '2026-03-30 11:48:13'),
-(7, 'hugo.bernard', 'hugo@ynov.com', 'hashhug', 'student', 'hugo.jpg', '2026-03-30 11:48:13'),
-(8, 'president.bde', 'bde@ynov.com', 'hashbde', 'staff', 'bde.jpg', '2026-03-30 11:48:13'),
-(9, 'admin.ynov', 'admin@ynov.com', 'hashadm', 'staff', 'admin.jpg', '2026-03-30 11:48:13');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `user_type`, `bio`, `photo`, `created_at`) VALUES
+(1, 'axel.moreau', 'axel@ynov.com', 'hash123', 'student', 'Dev full-stack passionné à Paris Ouest 🚀 Je cherche toujours un projet cool', 'axel.jpg', '2026-03-30 11:48:13'),
+(2, 'lea.chen', 'lea@ynov.com', 'hash456', 'student', 'UX/UI designer, je transforme vos idées en interfaces qui claquent ✨', 'lea.jpg', '2026-03-30 11:48:13'),
+(3, 'youssef.diallo', 'youssef@ynov.com', 'hash789', 'student', 'Etudiant à Lyon, nouveau sur le campus, je cherche une équipe 👋', 'youssef.jpg', '2026-03-30 11:48:13'),
+(4, 'camille.petit', 'camille@ynov.com', 'hash000', 'student', 'Community manager en devenir à Bordeaux 📈', 'camille.jpg', '2026-03-30 11:48:13'),
+(5, 'thomas.nguyen', 'thomas@ynov.com', 'hashabc', 'student', 'Passionné de sécu et d IA à Paris Ouest 🤖 Je code même le week-end', 'thomas.jpg', '2026-03-30 11:48:13'),
+(6, 'sofia.martin', 'sofia@ynov.com', 'hashsof', 'student', 'Game designer en herbe à Toulouse 🎮 Je crée mes premiers jeux Unity', 'sofia.jpg', '2026-03-30 11:48:13'),
+(7, 'hugo.bernard', 'hugo@ynov.com', 'hashhug', 'student', 'Réalisateur en devenir à Nantes 🎬 Spécialisé motion design', 'hugo.jpg', '2026-03-30 11:48:13'),
+(8, 'president.bde', 'bde@ynov.com', 'hashbde', 'staff', NULL, 'bde.jpg', '2026-03-30 11:48:13'),
+(9, 'admin.ynov', 'admin@ynov.com', 'hashadm', 'staff', NULL, 'admin.jpg', '2026-03-30 11:48:13');
 
 --
 -- Index pour les tables déchargées
@@ -799,3 +801,14 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+CREATE TABLE IF NOT EXISTS contacts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,       -- Celui qui ajoute
+    contact_id INT NOT NULL,    -- Celui qui est ajouté
+    status ENUM('pending', 'accepted') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (contact_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_friendship (user_id, contact_id) -- Évite les doublons
+);
