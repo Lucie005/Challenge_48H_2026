@@ -21,8 +21,9 @@
             <nav class="nav-menu">
                 <a href="{{ url_for('home') }}" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
                 <a href="{{ url_for('messages') }}" class="nav-icon active" title="Messages"><i class="far fa-comment-dots"></i></a>
-                <a href="{{ url_for('students_directory') }}" class="nav-icon" title="Étudiants"><i class="fas fa-user-friends"></i></a>
+                <a href="{{ url_for('users_directory') }}" class="nav-icon" title="Utilisateurs"><i class="fas fa-user-friends"></i></a>
                 <a href="{{ url_for('jobs') }}" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
+                <a href="{{ url_for('friends_page') }}" class="nav-icon" title="Mes Amis"><i class="fas fa-user-check"></i></a>
             </nav>
             <div class="spacer"></div>
             <a href="{{ url_for('register') }}" class="nav-icon btn-add" title="Ajouter un compte"><i class="fas fa-plus"></i></a>
@@ -45,7 +46,14 @@
                         </div>
                     </div>
 
-                    <div class="contacts-scroll" id="contacts-list">
+                    <div class="msg-tabs">
+                        <button class="msg-tab active" onclick="switchMsgTab('chats')">Conversations</button>
+                        <button class="msg-tab" onclick="switchMsgTab('requests')">
+                            Demandes {% if pending_requests|length > 0 %}<span class="req-count-badge">{{ pending_requests|length }}</span>{% endif %}
+                        </button>
+                    </div>
+
+                    <div class="contacts-scroll" id="chats-section">
                         {% for contact in contacts %}
                         <div class="contact-item {{ 'active' if active_id == contact.id else '' }}" 
                              data-id="{{ contact.id }}"
@@ -63,6 +71,30 @@
                         </div>
                         {% else %}
                         <p class="text-muted" style="padding: 20px; text-align: center;">Aucun contact. Allez dans l'annuaire pour discuter !</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="contacts-scroll hidden" id="requests-section">
+                        {% for req in pending_requests %}
+                        <div class="contact-item">
+                            <div class="contact-avatar-box">
+                                <img src="https://ui-avatars.com/api/?name={{ req.requester.username | replace(' ', '+') }}&background=E5E7EB&color=1F2937&size=50" alt="Avatar" class="contact-avatar">
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-top">
+                                    <span class="contact-name">{{ req.requester.username }}</span>
+                                </div>
+                                <div style="display: flex; gap: 8px; margin-top: 5px;">
+                                    <button class="btn-publish" style="padding: 4px 10px; font-size: 0.8rem;" onclick="respondFriend({{ req.id }}, 'accept')">Accepter</button>
+                                    <button class="btn-outline-danger" style="padding: 4px 10px; font-size: 0.8rem;" onclick="respondFriend({{ req.id }}, 'decline')">Refuser</button>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="empty-state" style="padding: 40px 20px;">
+                            <i class="fas fa-user-clock" style="font-size: 2rem; color: var(--border-color); margin-bottom: 10px;"></i>
+                            <p class="text-muted">Aucune demande en attente.</p>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -83,6 +115,29 @@
 
     <script>
         let currentPartnerId = null;
+
+        function switchMsgTab(tab) {
+            // Masquer toutes les sections
+            document.getElementById('chats-section').classList.add('hidden');
+            document.getElementById('requests-section').classList.add('hidden');
+            
+            // Désactiver tous les onglets
+            const tabs = document.querySelectorAll('.msg-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            // Activer la section et l'onglet cible
+            document.getElementById(`${tab}-section`).classList.remove('hidden');
+            const targetIdx = (tab === 'chats') ? 0 : 1;
+            tabs[targetIdx].classList.add('active');
+        }
+
+        async function respondFriend(requestId, action) {
+            try {
+                const response = await fetch(`/api/contact/${action}/${requestId}`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) location.reload();
+            } catch (e) { console.error(e); }
+        }
 
         async function loadConversation(userId, username) {
             currentPartnerId = userId;

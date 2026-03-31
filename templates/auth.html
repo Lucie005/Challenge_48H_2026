@@ -50,7 +50,7 @@
             <form id="form-login" class="auth-form" action="{{ url_for('login') }}" method="POST" {% if mode == 'register' %}style="display: none;"{% endif %}>
                 <div class="input-group">
                     <i class="far fa-envelope"></i>
-                    <input type="email" name="email" placeholder="prenom.nom@ynov.com" required>
+                    <input type="text" name="email" placeholder="Pseudo ou Email" required>
                 </div>
                 <div class="input-group">
                     <i class="fas fa-lock"></i>
@@ -67,7 +67,7 @@
                 </div>
                 <div class="input-group">
                     <i class="far fa-envelope"></i>
-                    <input type="email" name="email" placeholder="prenom.nom@ynov.com" required>
+                    <input type="text" name="email" placeholder="Pseudo ou Email" required>
                 </div>
                 <div class="input-group">
                     <i class="fas fa-lock"></i>

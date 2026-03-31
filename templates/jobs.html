@@ -21,8 +21,9 @@
             <nav class="nav-menu">
                 <a href="{{ url_for('home') }}" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
                 <a href="{{ url_for('messages') }}" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
-                <a href="{{ url_for('students_directory') }}" class="nav-icon" title="Étudiants"><i class="fas fa-user-friends"></i></a>
+                <a href="{{ url_for('users_directory') }}" class="nav-icon" title="Utilisateurs"><i class="fas fa-user-friends"></i></a>
                 <a href="{{ url_for('jobs') }}" class="nav-icon active" title="Jobs"><i class="fas fa-briefcase"></i></a>
+                <a href="{{ url_for('friends_page') }}" class="nav-icon" title="Mes Amis"><i class="fas fa-user-check"></i></a>
             </nav>
             <div class="spacer"></div>
             <a href="{{ url_for('register') }}" class="nav-icon btn-add" title="Ajouter un compte"><i class="fas fa-plus"></i></a>
@@ -57,9 +58,9 @@
                     <input type="text" placeholder="Rechercher par titre, entreprise...">
                     <div class="jobs-filters">
                         <i class="fas fa-filter text-muted"></i>
-                        <button class="filter-btn active">Tout</button>
-                        <button class="filter-btn">Stage</button>
-                        <button class="filter-btn">Alternance</button>
+                        <a href="{{ url_for('jobs', type='all') }}" class="filter-btn {{ 'active' if current_type == 'all' }}">Tout</a>
+                        <a href="{{ url_for('jobs', type='stage') }}" class="filter-btn {{ 'active' if current_type == 'stage' }}">Stage</a>
+                        <a href="{{ url_for('jobs', type='alternance') }}" class="filter-btn {{ 'active' if current_type == 'alternance' }}">Alternance</a>
                     </div>
                 </div>
 

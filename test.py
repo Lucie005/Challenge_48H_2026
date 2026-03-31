@@ -1,19 +1,5 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-
-app = Flask(__name__)
-
-### CONFIGURATION (Doit correspondre à app.py)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Admin123!@localhost/ynov_social'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
-
-# On définit un modèle minimal juste pour le test
-class User(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100))
+from app import app, db
+from modeles import User
 
 def test_connection():
     with app.app_context():

@@ -3,6 +3,7 @@ Flask-SQLAlchemy==3.1.1
 PyMySQL==1.1.0
 Werkzeug==3.0.1
 cryptography==41.0.5
-google-generativeai
+openai
+python-dotenv
 
 #pip install -r requirements.txt, command to install the required packages for the project.

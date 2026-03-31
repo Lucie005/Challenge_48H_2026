@@ -21,8 +21,9 @@
             <nav class="nav-menu">
                 <a href="{{ url_for('home') }}" class="nav-icon active" title="Accueil"><i class="fas fa-home"></i></a>
                 <a href="{{ url_for('messages') }}" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
-                <a href="{{ url_for('students_directory') }}" class="nav-icon" title="Étudiants"><i class="fas fa-user-friends"></i></a>
+                <a href="{{ url_for('users_directory') }}" class="nav-icon" title="Utilisateurs"><i class="fas fa-user-friends"></i></a>
                 <a href="{{ url_for('jobs') }}" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
+                <a href="{{ url_for('friends_page') }}" class="nav-icon" title="Mes Amis"><i class="fas fa-user-check"></i></a>
             </nav>
             <div class="spacer"></div>
             <a href="{{ url_for('register') }}" class="nav-icon btn-add" title="Ajouter un compte"><i class="fas fa-plus"></i></a>
@@ -91,7 +92,7 @@
                     <article class="card post-card">
                         <div class="post-header">
                             <a href="{{ url_for('profile', user_id=post.author.id) }}">
-                                <img src="{{ url_for('static', filename='img/' + (post.author.photo | default('default-avatar.jpg'))) }}" alt="{{ post.author.username }}" class="avatar">
+                                <img src="https://ui-avatars.com/api/?name={{ post.author.username | replace(' ', '+') }}&background=random&size=50" alt="{{ post.author.username }}" class="avatar">
                             </a>
                             <div class="post-meta">
                                 <a href="{{ url_for('profile', user_id=post.author.id) }}" style="text-decoration: none; color: inherit;">
@@ -105,7 +106,11 @@
                                         {% endif %}
                                     </h4>
                                 </a>
-                                <span class="text-muted">{{ post.author.filiere if post.author.user_type == 'student' else post.author.role_title }} · {{ post.timestamp.strftime('%d/%m à %H:%M') }}</span>
+                                <span class="text-muted">
+                                    {% if post.author.user_type == 'student' %}{{ post.author.filiere }}
+                                    {% elif post.author.user_type == 'staff' %}{{ post.author.role_title }}
+                                    {% else %}{{ post.author.organization }}{% endif %}
+                                     · {{ post.timestamp.strftime('%d/%m à %H:%M') }}</span>
                             </div>
                             <i class="far fa-bookmark bookmark-icon"></i>
                         </div>
@@ -126,9 +131,25 @@
                             </div>
                         </div>
                         <div class="post-footer">
-                            <button class="action-btn"><i class="far fa-heart"></i> {{ post.likes_count | default(0) }}</button>
-                            <button class="action-btn"><i class="far fa-comment"></i> {{ post.comments_count | default(0) }}</button>
+                            <button type="button" class="action-btn like-btn" data-post-id="{{ post.id }}" onclick="toggleLike(this)">
+                                <i class="{{ 'fas text-danger' if user and post.is_liked_by(user.id) else 'far' }} fa-heart"></i> 
+                                <span class="count">{{ post.likes_count | default(0) }}</span>
+                            </button>
+                            <button class="action-btn" onclick="document.getElementById('comments-{{ post.id }}').classList.toggle('hidden')">
+                                <i class="far fa-comment"></i> {{ post.comments_count | default(0) }}
+                            </button>
                             <button class="action-btn"><i class="fas fa-share-alt"></i></button>
+                        </div>
+                        <div id="comments-{{ post.id }}" class="hidden" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                            {% for comment in post.comments %}
+                                <div style="margin-bottom: 8px; font-size: 0.9rem;">
+                                    <strong>{{ comment.author.username }} :</strong> {{ comment.contenu }}
+                                </div>
+                            {% endfor %}
+                            <form action="{{ url_for('add_comment', post_id=post.id) }}" method="POST" style="display: flex; gap: 10px; margin-top: 10px;">
+                                <input type="text" name="contenu" placeholder="Écrire un commentaire..." style="flex: 1; border: 1px solid var(--border-color); border-radius: 20px; padding: 5px 15px; outline: none;">
+                                <button type="submit" class="send-btn"><i class="fas fa-paper-plane"></i></button>
+                            </form>
                         </div>
                     </article>
                     {% else %}
@@ -196,6 +217,25 @@
     </div>
 
     <script>
+        async function toggleLike(btn) {
+            const postId = btn.getAttribute('data-post-id');
+            try {
+                const response = await fetch(`/like/${postId}`, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const icon = btn.querySelector('i');
+                    const countSpan = btn.querySelector('.count');
+                    icon.classList.toggle('fas');
+                    icon.classList.toggle('far');
+                    icon.classList.toggle('text-danger');
+                    countSpan.innerText = data.count;
+                }
+            } catch (e) { console.error("Erreur Like:", e); }
+        }
+
         function toggleMediaInput(select) {
             const input = document.getElementById('media-url-input');
             input.style.display = (select.value === 'text') ? 'none' : 'block';

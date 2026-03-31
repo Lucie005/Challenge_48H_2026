@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Y - Profil</title>
+    <title>Y - Profil de {{ user.username }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -20,8 +20,9 @@
             <nav class="nav-menu">
                 <a href="{{ url_for('home') }}" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
                 <a href="{{ url_for('messages') }}" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
-                <a href="{{ url_for('students_directory') }}" class="nav-icon" title="Étudiants"><i class="fas fa-user-friends"></i></a>
+                <a href="{{ url_for('users_directory') }}" class="nav-icon" title="Utilisateurs"><i class="fas fa-user-friends"></i></a>
                 <a href="{{ url_for('jobs') }}" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
+                <a href="{{ url_for('friends_page') }}" class="nav-icon" title="Mes Amis"><i class="fas fa-user-check"></i></a>
             </nav>
             <div class="spacer"></div>
             <a href="{{ url_for('register') }}" class="nav-icon btn-add" title="Ajouter un compte"><i class="fas fa-plus"></i></a>
@@ -36,7 +37,12 @@
                 
                 <section class="card profile-header-card">
                     <div class="profile-banner">
-                        <span class="badge-campus-banner"><span class="dot"></span> Paris Ynov Campus</span>
+                        <span class="badge-campus-banner">
+                            <span class="dot"></span> 
+                            {% if user.user_type in ['student', 'staff'] and user.campus %}
+                                {{ user.campus.nom }}
+                            {% else %}Ynov Community{% endif %}
+                        </span>
                     </div>
                     
                     <div class="profile-info-container">
@@ -45,10 +51,12 @@
                                 <img src="https://ui-avatars.com/api/?name={{ user.username | default('Alex') | replace(' ', '+') }}&background=7C3AED&color=fff&size=128" alt="Photo de profil" class="avatar-large">                            
                                 <div class="profile-actions">
                                     {% if is_own_profile %}
-                                        <button type="submit" class="btn-outline" style="background: var(--primary); color: white; border: none;">
+                                        <button type="button" id="edit-btn" class="btn-outline" onclick="toggleEdit()">
+                                            <i class="fas fa-edit"></i> Modifier le profil
+                                        </button>
+                                        <button type="submit" id="save-btn" class="btn-outline hidden" style="background: var(--primary); color: white; border: none;">
                                             <i class="fas fa-save"></i> Enregistrer
                                         </button>
-                                        <a href="{{ url_for('logout') }}" class="btn-outline btn-outline-danger logout-profile"><i class="fas fa-sign-out-alt"></i> Quitter</a>
                                     {% else %}
                                         {% if rel_status %}
                                             <button class="btn-outline" disabled>
@@ -56,7 +64,7 @@
                                                 {{ 'Demande envoyée' if rel_status == 'pending' else 'Ami' }}
                                             </button>
                                         {% else %}
-                                            <button class="btn-outline" id="add-btn-profile" onclick="addFriendProfile({{ users.id }})"><i class="fas fa-user-plus"></i> Ajouter</button>
+                                            <button type="button" class="btn-outline" id="add-btn-profile" onclick="addFriendProfile({{ user.id }})"><i class="fas fa-user-plus"></i> Ajouter</button>
                                         {% endif %}
                                         <a href="{{ url_for('messages', user_id=user.id) }}" class="btn-outline"><i class="far fa-comment"></i> Message</a>
                                     {% endif %}
@@ -64,11 +72,33 @@
                             </div>
 
                             {% if is_own_profile %}
-                                <input type="text" name="username" class="profile-name" value="{{ user.username }}" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 5px; width: 100%; margin-bottom: 10px;">
-                                <input type="text" name="filiere" class="profile-filiere" value="{{ user.filiere }}" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 5px; width: 100%; margin-bottom: 10px;">
+                                <div id="display-name-area">
+                                    <h2 class="profile-name">{{ user.username }}</h2>
+                                    <p class="profile-filiere">
+                                        <i class="fas {{ 'fa-book-open' if user.user_type == 'student' else ('fa-briefcase' if user.user_type == 'staff' else 'fa-building') }}"></i>
+                                        {% if user.user_type == 'student' %}{{ user.filiere or 'Étudiant' }}
+                                        {% elif user.user_type == 'staff' %}{{ user.role_title or 'Staff' }}
+                                        {% else %}{{ user.organization or 'Entreprise' }}{% endif %}
+                                    </p>
+                                </div>
+                                <div id="edit-name-area" class="hidden">
+                                    <input type="text" name="username" class="profile-name" value="{{ user.username }}" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 5px; width: 100%; margin-bottom: 10px;">
+                                    {% if user.user_type == 'student' %}
+                                        <input type="text" name="filiere" class="profile-filiere" value="{{ user.filiere }}" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 5px; width: 100%; margin-bottom: 10px;">
+                                    {% elif user.user_type == 'staff' %}
+                                        <input type="text" name="role_title" class="profile-filiere" value="{{ user.role_title }}" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 5px; width: 100%; margin-bottom: 10px;">
+                                    {% elif user.user_type == 'external' %}
+                                        <input type="text" name="organization" class="profile-filiere" value="{{ user.organization }}" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 5px; width: 100%; margin-bottom: 10px;">
+                                    {% endif %}
+                                </div>
                             {% else %}
                                 <h2 class="profile-name">{{ user.username }}</h2>
-                                <p class="profile-filiere"><i class="fas fa-book-open"></i> {{ user.filiere or 'Non renseigné' }}</p>
+                                <p class="profile-filiere">
+                                    <i class="fas {{ 'fa-book-open' if user.user_type == 'student' else ('fa-briefcase' if user.user_type == 'staff' else 'fa-building') }}"></i>
+                                    {% if user.user_type == 'student' %}{{ user.filiere or 'Étudiant' }}
+                                    {% elif user.user_type == 'staff' %}{{ user.role_title or 'Staff' }}
+                                    {% else %}{{ user.organization or 'Entreprise' }}{% endif %}
+                                </p>
                             {% endif %}
 
                             <div class="profile-stats">
@@ -78,8 +108,27 @@
                             </div>
 
                             {% if is_own_profile %}
-                                <textarea name="bio" class="profile-bio" style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; min-height: 100px;">{{ user.bio }}</textarea>
-                                <input type="text" name="skills" placeholder="Compétences (séparées par des virgules)" value="{{ user.skills }}" style="width: 100%; margin-top: 10px; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px;">
+                                <div id="display-bio-area">
+                                    <p class="profile-bio">{{ user.bio if user.bio else "Aucune bio renseignée." }}</p>
+                                </div>
+                                <div id="edit-bio-area" class="hidden">
+                                    <textarea name="bio" class="profile-bio" style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; min-height: 100px;">{{ user.bio }}</textarea>
+                                    {% if user.user_type == 'student' %}
+                                        <div id="skills-editor" style="margin-top: 15px;">
+                                            <label class="small-text text-muted" style="display: block; margin-bottom: 5px;">Gérer mes compétences :</label>
+                                            <div id="skills-tags-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                                                <!-- Les tags seront générés ici par le JavaScript -->
+                                            </div>
+                                            <div style="display: flex; gap: 10px;">
+                                                <input type="text" id="new-skill-input" placeholder="Ajouter une compétence..." onkeypress="if(event.key === 'Enter') { event.preventDefault(); addSkillTag(); }" style="flex: 1; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; outline: none;">
+                                                <button type="button" class="btn-outline" onclick="addSkillTag()" style="background: var(--primary-faint); color: var(--primary); border-color: var(--primary-light);">
+                                                    <i class="fas fa-plus"></i> Valider
+                                                </button>
+                                            </div>
+                                            <input type="hidden" name="skills" id="skills-hidden-input" value="{{ user.skills or '' }}">
+                                        </div>
+                                    {% endif %}
+                                </div>
                             {% else %}
                                 <p class="profile-bio">{{ user.bio or "Aucune bio renseignée." }}</p>
                             {% endif %}
@@ -95,22 +144,44 @@
 
                 <div class="profile-grid">
                     <section class="card skills-card">
-                        <h3>Compétences</h3>
+                        <h3>{% if user.user_type == 'external' %}Infos Entreprise{% else %}Compétences{% endif %}</h3>
                         <div class="skills-list">
-                            <span class="skill-tag">React</span>
-                            <span class="skill-tag">TypeScript</span>
-                            <span class="skill-tag">Node.js</span>
-                            <span class="skill-tag">Python</span>
-                            <span class="skill-tag">Docker</span>
+                            {% if user.user_type == 'student' and user.skills %}
+                                {% for skill in user.skills.split(',') %}
+                                    <span class="skill-tag">{{ skill.strip() }}</span>
+                                {% endfor %}
+                            {% elif user.user_type == 'external' %}
+                                <p class="small-text text-muted">{{ user.description or 'Aucune description.' }}</p>
+                            {% else %}
+                                <span class="skill-tag">Ynov Member</span>
+                            {% endif %}
                         </div>
                     </section>
 
                     <section class="card publications-card">
                         <h3>Publications récentes</h3>
-                        <div class="empty-state">
-                            <i class="fas fa-pen-nib"></i>
-                            <p class="text-muted">Vous n'avez pas encore publié.</p>
-                        </div>
+                        {% if user.posts %}
+                            <div class="profile-posts-list">
+                                {% for post in user.posts | sort(attribute='timestamp', reverse=True) %}
+                                    <div class="post-item-simple">
+                                        <div class="post-content-small">{{ post.content | truncate(150) }}</div>
+                                        <div class="post-meta-small">
+                                            <span class="text-muted small-text">{{ post.timestamp.strftime('%d/%m/%Y') }}</span>
+                                            {% if is_own_profile %}
+                                                <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" onsubmit="return confirm('Supprimer ce poste ?');" style="display:inline;">
+                                                    <button type="submit" class="text-danger-link"><i class="fas fa-trash"></i></button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-pen-nib"></i>
+                                <p class="text-muted">Aucune publication.</p>
+                            </div>
+                        {% endif %}
                     </section>
                 </div>
             </div>
@@ -128,6 +199,68 @@
                     btn.disabled = true;
                 }
             } catch (e) { console.error(e); }
+        }
+
+        // --- Logique de gestion dynamique des compétences ---
+        let skillsList = [];
+
+        function initSkills() {
+            const hiddenInput = document.getElementById('skills-hidden-input');
+            if (!hiddenInput) return;
+            const val = hiddenInput.value;
+            // On transforme la chaîne "Skill1, Skill2" en tableau
+            skillsList = val ? val.split(',').map(s => s.trim()).filter(s => s !== "") : [];
+            renderSkillTags();
+        }
+
+        // Sécurité : Si le script charge après l'événement DOMContentLoaded
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', initSkills);
+        } else {
+            initSkills();
+        }
+
+        function renderSkillTags() {
+            const container = document.getElementById('skills-tags-container');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            skillsList.forEach((skill, index) => {
+                container.innerHTML += `
+                    <span class="skill-tag-edit">
+                        ${skill}
+                        <button type="button" onclick="removeSkillTag(${index})" title="Supprimer">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </span>
+                `;
+            });
+            // On met à jour le champ caché pour l'envoi du formulaire
+            document.getElementById('skills-hidden-input').value = skillsList.join(',');
+        }
+
+        function addSkillTag() {
+            const input = document.getElementById('new-skill-input');
+            const skill = input.value.trim();
+            if (skill && !skillsList.includes(skill)) {
+                skillsList.push(skill);
+                input.value = '';
+                renderSkillTags();
+            }
+        }
+
+        function removeSkillTag(index) {
+            skillsList.splice(index, 1);
+            renderSkillTags();
+        }
+
+        function toggleEdit() {
+            document.getElementById('display-name-area').classList.toggle('hidden');
+            document.getElementById('edit-name-area').classList.toggle('hidden');
+            document.getElementById('display-bio-area').classList.toggle('hidden');
+            document.getElementById('edit-bio-area').classList.toggle('hidden');
+            document.getElementById('edit-btn').classList.toggle('hidden');
+            document.getElementById('save-btn').classList.toggle('hidden');
         }
     </script>
 </body>

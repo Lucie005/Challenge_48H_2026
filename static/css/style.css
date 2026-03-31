@@ -38,6 +38,7 @@ body {
 
 .text-muted { color: var(--text-muted); }
 .small-text { font-size: 0.85rem; }
+.hidden { display: none !important; }
 
 /* =========================================
    HEADER MOBILE (Caché sur PC)
@@ -155,6 +156,47 @@ body {
 .post-footer { display: flex; gap: 20px; border-top: 1px solid var(--border-color); padding-top: 15px; flex-wrap: wrap; }
 .action-btn { background: transparent; border: none; color: var(--text-muted); display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.95rem; }
 .action-btn:hover { color: var(--primary); }
+
+/* =========================================
+   PROFILE POSTS LIST
+========================================= */
+.profile-posts-list { display: flex; flex-direction: column; gap: 15px; }
+.post-item-simple { padding: 15px; border-bottom: 1px solid var(--border-color); }
+.post-item-simple:last-child { border-bottom: none; }
+.post-content-small { margin-bottom: 10px; font-size: 0.95rem; line-height: 1.4; }
+.post-meta-small { display: flex; justify-content: space-between; align-items: center; }
+.text-danger-link { background: none; border: none; color: var(--danger); cursor: pointer; padding: 5px; opacity: 0.6; transition: opacity 0.2s; }
+.text-danger-link:hover { opacity: 1; }
+
+/* =========================================
+   DESIGN DES TAGS DE COMPÉTENCES (ÉDITION)
+========================================= */
+.skill-tag-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--primary-faint);
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid var(--primary-light);
+}
+.skill-tag-edit button {
+    border: none;
+    background: transparent;
+    color: var(--danger);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    font-size: 0.9rem;
+    transition: transform 0.2s;
+}
+.skill-tag-edit button:hover {
+    transform: scale(1.2);
+}
 
 /* =========================================
    WIDGETS (RIGHT COLUMN)
@@ -296,7 +338,7 @@ body {
 /* =========================================
    MESSAGES VIEW
 ========================================= */
-.messages-wrapper { display: flex; height: calc(100vh - 50px); background-color: white; border-radius: 24px; border: 1px solid var(--border-color); overflow: hidden; padding: 0; gap: 0; }
+.messages-wrapper { display: flex; height: calc(100vh - 50px); width: 100%; max-width: 100%; background-color: white; border-radius: 24px; border: 1px solid var(--border-color); overflow: hidden; padding: 0; gap: 0; }
 .conversations-list { width: 350px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; background-color: white; }
 .conversations-header { padding: 20px; border-bottom: 1px solid var(--border-color); }
 .conversations-header h2 { font-size: 1.5rem; margin-bottom: 15px; }
@@ -318,8 +360,20 @@ body {
 .contact-preview { font-size: 0.9rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .unread-badge { background-color: var(--primary); color: white; font-size: 0.75rem; font-weight: bold; padding: 2px 8px; border-radius: 10px; margin-left: 10px; flex-shrink: 0; }
-.chat-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #FAFAFA; }
-.empty-chat-state { text-align: center; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 20px; }
+.chat-header { padding: 15px 25px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: white; width: 100%; }
+.chat-header-user { display: flex; align-items: center; gap: 12px; }
+.chat-header-user img { width: 40px; height: 40px; border-radius: 12px; object-fit: cover; }
+.chat-header-info h3 { font-size: 1rem; margin: 0; }
+.chat-header-actions { display: flex; gap: 8px; }
+.msg-tabs { display: flex; border-bottom: 1px solid var(--border-color); background: white; }
+.msg-tab { flex: 1; padding: 12px; border: none; background: none; font-weight: 600; color: var(--text-muted); cursor: pointer; position: relative; transition: all 0.2s; }
+.msg-tab.active { color: var(--primary); }
+.msg-tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: var(--primary); }
+.msg-tab:hover:not(.active) { color: var(--text-main); background: var(--bg-app); }
+.req-count-badge { background: var(--danger); color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: 5px; vertical-align: middle; }
+
+.chat-area { flex: 1; display: flex; flex-direction: column; background-color: #FAFAFA; align-items: stretch; position: relative; }
+.empty-chat-state { text-align: center; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; padding: 20px; flex: 1; }
 .empty-chat-icon { width: 70px; height: 70px; background-color: var(--primary-faint); color: var(--primary); border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 2rem; transform: rotate(-10deg); }
 
 /* =========================================

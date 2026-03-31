@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accès Restreint - Ynov Social</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .lock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80vh;
+            text-align: center;
+            padding: 20px;
+        }
+        .lock-icon {
+            font-size: 5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            background: var(--primary-faint);
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="lock-container">
+        <div class="lock-icon"><i class="fas fa-lock"></i></div>
+        <h1>Oups ! Espace réservé</h1>
+        <p class="text-muted" style="margin: 15px 0 30px 0; max-width: 400px;">
+            Vous devez être connecté pour accéder à l'annuaire des étudiants et aux offres YMatch.
+        </p>
+        <div style="display: flex; gap: 15px;">
+            <a href="{{ url_for('login') }}" class="btn-publish" style="text-decoration: none;">Se connecter</a>
+            <a href="{{ url_for('home') }}" class="btn-outline" style="text-decoration: none;">Retour à l'accueil</a>
+        </div>
+    </div>
+</body>
+</html>
