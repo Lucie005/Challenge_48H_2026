@@ -132,13 +132,36 @@
                             {% else %}
                                 <p class="profile-bio">{{ user.bio or "Aucune bio renseignée." }}</p>
                             {% endif %}
-                        </form>
 
-                        <div class="profile-links">
-                            <a href="#" class="link-btn"><i class="fab fa-github"></i> GitHub</a>
-                            <a href="#" class="link-btn"><i class="fab fa-linkedin" style="color: #0A66C2;"></i> LinkedIn</a>
-                            <a href="#" class="link-btn"><i class="fas fa-globe"></i> Portfolio</a>
-                        </div>
+                            {% if is_own_profile %}
+                                <div id="display-links-area" class="profile-links" style="margin-top: 15px;">
+                                    {% if user.github_url %}<a href="{{ user.github_url }}" target="_blank" class="link-btn"><i class="fab fa-github"></i> GitHub</a>{% endif %}
+                                    {% if user.linkedin_url %}<a href="{{ user.linkedin_url }}" target="_blank" class="link-btn"><i class="fab fa-linkedin" style="color: #0A66C2;"></i> LinkedIn</a>{% endif %}
+                                    {% if user.portfolio_url %}<a href="{{ user.portfolio_url }}" target="_blank" class="link-btn"><i class="fas fa-globe"></i> Portfolio</a>{% endif %}
+                                </div>
+                                <div id="edit-links-area" class="hidden" style="margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
+                                    <div class="input-group" style="display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-color); border-radius: 8px; padding: 5px 10px;">
+                                        <i class="fab fa-github"></i>
+                                        <input type="url" name="github_url" placeholder="Lien GitHub (https://...)" value="{{ user.github_url or '' }}" style="border: none; outline: none; flex: 1;">
+                                    </div>
+                                    <div class="input-group" style="display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-color); border-radius: 8px; padding: 5px 10px;">
+                                        <i class="fab fa-linkedin" style="color: #0A66C2;"></i>
+                                        <input type="url" name="linkedin_url" placeholder="Lien LinkedIn (https://...)" value="{{ user.linkedin_url or '' }}" style="border: none; outline: none; flex: 1;">
+                                    </div>
+                                    <div class="input-group" style="display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-color); border-radius: 8px; padding: 5px 10px;">
+                                        <i class="fas fa-globe"></i>
+                                        <input type="url" name="portfolio_url" placeholder="Lien Portfolio (https://...)" value="{{ user.portfolio_url or '' }}" style="border: none; outline: none; flex: 1;">
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="profile-links" style="margin-top: 15px;">
+                                    {% if user.github_url %}<a href="{{ user.github_url }}" target="_blank" class="link-btn"><i class="fab fa-github"></i> GitHub</a>{% endif %}
+                                    {% if user.linkedin_url %}<a href="{{ user.linkedin_url }}" target="_blank" class="link-btn"><i class="fab fa-linkedin" style="color: #0A66C2;"></i> LinkedIn</a>{% endif %}
+                                    {% if user.portfolio_url %}<a href="{{ user.portfolio_url }}" target="_blank" class="link-btn"><i class="fas fa-globe"></i> Portfolio</a>{% endif %}
+                                    {% if not user.github_url and not user.linkedin_url and not user.portfolio_url %}<p class="small-text text-muted">Aucun lien social.</p>{% endif %}
+                                </div>
+                            {% endif %}
+                        </form>
                     </div>
                 </section>
 
@@ -259,6 +282,8 @@
             document.getElementById('edit-name-area').classList.toggle('hidden');
             document.getElementById('display-bio-area').classList.toggle('hidden');
             document.getElementById('edit-bio-area').classList.toggle('hidden');
+            document.getElementById('display-links-area').classList.toggle('hidden');
+            document.getElementById('edit-links-area').classList.toggle('hidden');
             document.getElementById('edit-btn').classList.toggle('hidden');
             document.getElementById('save-btn').classList.toggle('hidden');
         }

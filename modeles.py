@@ -27,6 +27,9 @@ class User(db.Model):
     photo = db.Column(db.String(255))
     password_hash = db.Column(db.String(255), nullable=False)
     bio = db.Column(db.Text)
+    github_url = db.Column(db.String(255))
+    linkedin_url = db.Column(db.String(255))
+    portfolio_url = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.now)
     
     # Système d'héritage (Polymorphisme)

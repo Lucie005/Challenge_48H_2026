@@ -30,7 +30,10 @@ with app.app_context():
             "ALTER TABLE users MODIFY COLUMN user_type VARCHAR(20)",
             "ALTER TABLE posts ADD COLUMN is_projet TINYINT(1) DEFAULT 0",
             "ALTER TABLE posts ADD COLUMN is_recherche TINYINT(1) DEFAULT 0",
-            "ALTER TABLE users ADD COLUMN bio TEXT"
+            "ALTER TABLE users ADD COLUMN bio TEXT",
+            "ALTER TABLE users ADD COLUMN github_url VARCHAR(255)",
+            "ALTER TABLE users ADD COLUMN linkedin_url VARCHAR(255)",
+            "ALTER TABLE users ADD COLUMN portfolio_url VARCHAR(255)"
         ]
         for cmd in commands:
             try:
@@ -225,6 +228,9 @@ def update_profile():
     
     user.username = request.form.get('username')
     user.bio = request.form.get('bio')
+    user.github_url = request.form.get('github_url')
+    user.linkedin_url = request.form.get('linkedin_url')
+    user.portfolio_url = request.form.get('portfolio_url')
     
     if user.user_type == 'student':
         user.filiere = request.form.get('filiere')
