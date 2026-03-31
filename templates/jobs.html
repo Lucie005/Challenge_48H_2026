@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Y - Ymatch Jobs</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
@@ -17,19 +17,21 @@
     <div class="app-container">
         
         <aside class="sidebar">
-            <a href="#" class="logo-btn">Y</a>
+            <a href="{{ url_for('home') }}" class="logo-btn">Y</a>
             <nav class="nav-menu">
-                <a href="index.html" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
-                <a href="profile.html" class="nav-icon" title="Profil"><i class="far fa-user"></i></a>
-                <a href="messages.html" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
-                <a href="student.html" class="nav-icon" title="Étudiants"><i class="fas fa-user-friends"></i></a>
-                <a href="jobs.html" class="nav-icon active" title="Jobs"><i class="fas fa-briefcase"></i></a>
+                <a href="{{ url_for('home') }}" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
+                <a href="{{ url_for('messages') }}" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
+                <a href="{{ url_for('users_directory') }}" class="nav-icon" title="Utilisateurs"><i class="fas fa-user-friends"></i></a>
+                <a href="{{ url_for('jobs') }}" class="nav-icon active" title="Jobs"><i class="fas fa-briefcase"></i></a>
+                <a href="{{ url_for('friends_page') }}" class="nav-icon" title="Mes Amis"><i class="fas fa-user-check"></i></a>
             </nav>
             <div class="spacer"></div>
-            <a href="#" class="nav-icon btn-add"><i class="fas fa-plus"></i></a>
+            <a href="{{ url_for('register') }}" class="nav-icon btn-add" title="Ajouter un compte"><i class="fas fa-plus"></i></a>
             
-            <img src="https://ui-avatars.com/api/?name=Alex+Martin&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
-            <a href="auth.html" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
+            <a href="{{ url_for('profile') }}" title="Mon profil">
+                <img src="https://ui-avatars.com/api/?name={{ session['username'] | replace(' ', '+') if session['username'] else 'User' }}&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
+            </a>
+            <a href="{{ url_for('logout') }}" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
         </aside>
 
         <main class="main-content">
@@ -56,9 +58,9 @@
                     <input type="text" placeholder="Rechercher par titre, entreprise...">
                     <div class="jobs-filters">
                         <i class="fas fa-filter text-muted"></i>
-                        <button class="filter-btn active">Tout</button>
-                        <button class="filter-btn">Stage</button>
-                        <button class="filter-btn">Alternance</button>
+                        <a href="{{ url_for('jobs', type='all') }}" class="filter-btn {{ 'active' if current_type == 'all' }}">Tout</a>
+                        <a href="{{ url_for('jobs', type='stage') }}" class="filter-btn {{ 'active' if current_type == 'stage' }}">Stage</a>
+                        <a href="{{ url_for('jobs', type='alternance') }}" class="filter-btn {{ 'active' if current_type == 'alternance' }}">Alternance</a>
                     </div>
                 </div>
 

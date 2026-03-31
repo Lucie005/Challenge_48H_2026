@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Y - Fil d'actualité</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
@@ -17,18 +17,24 @@
     <div class="app-container">
         
         <aside class="sidebar">
-            <a href="#" class="logo-btn">Y</a>
+            <a href="{{ url_for('home') }}" class="logo-btn">Y</a>
             <nav class="nav-menu">
-                <a href="index.html" class="nav-icon active" title="Accueil"><i class="fas fa-home"></i></a>
-                <a href="profile.html" class="nav-icon" title="Profil"><i class="far fa-user"></i></a>
-                <a href="messages.html" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
-                <a href="student.html" class="nav-icon" title="Étudiants"><i class="fas fa-user-friends"></i></a>
-                <a href="jobs.html" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
+                <a href="{{ url_for('home') }}" class="nav-icon active" title="Accueil"><i class="fas fa-home"></i></a>
+                <a href="{{ url_for('messages') }}" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
+                <a href="{{ url_for('users_directory') }}" class="nav-icon" title="Utilisateurs"><i class="fas fa-user-friends"></i></a>
+                <a href="{{ url_for('jobs') }}" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
+                <a href="{{ url_for('friends_page') }}" class="nav-icon" title="Mes Amis"><i class="fas fa-user-check"></i></a>
             </nav>
             <div class="spacer"></div>
-            <a href="#" class="nav-icon btn-add"><i class="fas fa-plus"></i></a>
-            <img src="https://ui-avatars.com/api/?name=Alex+Martin&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
-            <a href="auth.html" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
+            <a href="{{ url_for('register') }}" class="nav-icon btn-add" title="Ajouter un compte"><i class="fas fa-plus"></i></a>
+            {% if user %}
+                <a href="{{ url_for('profile') }}" title="Mon profil">
+                    <img src="https://ui-avatars.com/api/?name={{ user.username | replace(' ', '+') }}&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-icon" title="Connexion"><i class="fas fa-sign-in-alt"></i></a>
+            {% endif %}
         </aside>
 
         <main class="main-content">
@@ -41,44 +47,109 @@
                             <span class="text-muted">Paris Ynov Campus</span>
                         </div>
                         <div class="feed-filters">
-                            <button class="filter-btn active">Tout</button>
-                            <button class="filter-btn">Post</button>
-                            <button class="filter-btn">Projet</button>
-                            <button class="filter-btn">Recherche</button>
+                            <a href="{{ url_for('home', filter='all') }}" class="filter-btn {{ 'active' if current_filter == 'all' else '' }}">Tout</a>
+                            <a href="{{ url_for('home', filter='post') }}" class="filter-btn {{ 'active' if current_filter == 'post' else '' }}">Post</a>
+                            <a href="{{ url_for('home', filter='projet') }}" class="filter-btn {{ 'active' if current_filter == 'projet' else '' }}">Projet</a>
+                            <a href="{{ url_for('home', filter='recherche') }}" class="filter-btn {{ 'active' if current_filter == 'recherche' else '' }}">Recherche</a>
                         </div>
                     </div>
 
-                    <div class="card create-post">
-                        <img src="https://ui-avatars.com/api/?name=Alex+Martin&background=7C3AED&color=fff&size=50" alt="Avatar" class="avatar">
-                        <textarea placeholder="Partager avec les étudiants de Paris Ynov Campus..." rows="2"></textarea>
+                    {% if user %}
+                    <form action="{{ url_for('create_post') }}" method="POST" class="card create-post-form">
+                        <div class="create-post-header">
+                            <img src="https://ui-avatars.com/api/?name={{ user.username | replace(' ', '+') }}&background=7C3AED&color=fff&size=50" alt="Avatar" class="avatar">
+                            <textarea name="content" placeholder="Partager avec les étudiants de Paris Ynov Campus..." rows="2" required></textarea>
+                        </div>
+                        <div class="create-post-options">
+                            <div class="option-group">
+                                <label><i class="fas fa-tag"></i> Type :</label>
+                                <select name="post_type">
+                                    <option value="post">Post</option>
+                                    <option value="projet">🚀 Projet</option>
+                                    <option value="recherche">🔍 Recherche</option>
+                                </select>
+                            </div>
+                            <div class="option-group">
+                                <label><i class="fas fa-icons"></i> Média :</label>
+                                <select name="media_type" onchange="toggleMediaInput(this)">
+                                    <option value="text">Texte</option>
+                                    <option value="image">Image</option>
+                                    <option value="video">Vidéo</option>
+                                </select>
+                            </div>
+                            <input type="text" name="media_url" id="media-url-input" placeholder="URL du média (JPG, PNG, MP4...)" style="display:none;">
+                            <button type="submit" class="btn-publish">Publier <i class="far fa-paper-plane"></i></button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div class="card" style="text-align: center; padding: 20px;">
+                        <p class="text-muted">Vous devez être connecté pour publier un post.</p>
+                        <a href="{{ url_for('login') }}" class="btn-postuler" style="display: inline-block; width: auto; margin-top: 10px; padding: 8px 20px;">Se connecter</a>
                     </div>
+                    {% endif %}
 
                     {% for post in posts %}
                     <article class="card post-card">
                         <div class="post-header">
-                            <img src="../static/img/{{ post.author.photo | default('default-avatar.jpg') }}" alt="{{ post.author.username }}" class="avatar">
+                            <a href="{{ url_for('profile', user_id=post.author.id) }}">
+                                <img src="https://ui-avatars.com/api/?name={{ post.author.username | replace(' ', '+') }}&background=random&size=50" alt="{{ post.author.username }}" class="avatar">
+                            </a>
                             <div class="post-meta">
-                                <h4>{{ post.author.username }} 
-                                    {% if post.is_projet %}
-                                        <span class="badge badge-projet">🚀 Projet</span>
-                                    {% else %}
-                                        <span class="badge badge-post">Post</span>
-                                    {% endif %}
-                                </h4>
-                                <span class="text-muted">{{ post.author.filiere }} · {{ post.created_at }}</span>
+                                <a href="{{ url_for('profile', user_id=post.author.id) }}" style="text-decoration: none; color: inherit;">
+                                    <h4>{{ post.author.username }} 
+                                        {% if post.is_projet %}
+                                            <span class="badge badge-projet">🚀 Projet</span>
+                                        {% elif post.is_recherche %}
+                                            <span class="badge badge-recherche">🔍 Recherche</span>
+                                        {% else %}
+                                            <span class="badge badge-post">Post</span>
+                                        {% endif %}
+                                    </h4>
+                                </a>
+                                <span class="text-muted">
+                                    {% if post.author.user_type == 'student' %}{{ post.author.filiere }}
+                                    {% elif post.author.user_type == 'staff' %}{{ post.author.role_title }}
+                                    {% else %}{{ post.author.organization }}{% endif %}
+                                     · {{ post.timestamp.strftime('%d/%m à %H:%M') }}</span>
                             </div>
                             <i class="far fa-bookmark bookmark-icon"></i>
                         </div>
                         <div class="post-body">
                             <p>{{ post.content }}</p>
+                            {% if post.media_url %}
+                                {% if post.media_type == 'image' %}
+                                    <img src="{{ post.media_url }}" alt="Post media" style="max-width: 100%; border-radius: 12px; margin-top: 10px;">
+                                {% elif post.media_type == 'video' %}
+                                    <video controls style="max-width: 100%; border-radius: 12px; margin-top: 10px;">
+                                        <source src="{{ post.media_url }}" type="video/mp4">
+                                        Votre navigateur ne supporte pas la lecture de vidéos.
+                                    </video>
+                                {% endif %}
+                            {% endif %}
                             <div class="post-tags">
                                 <span class="tag">#Ynov</span>
                             </div>
                         </div>
                         <div class="post-footer">
-                            <button class="action-btn"><i class="far fa-heart"></i> {{ post.likes_count | default(0) }}</button>
-                            <button class="action-btn"><i class="far fa-comment"></i> {{ post.comments_count | default(0) }}</button>
+                            <button type="button" class="action-btn like-btn" data-post-id="{{ post.id }}" onclick="toggleLike(this)">
+                                <i class="{{ 'fas text-danger' if user and post.is_liked_by(user.id) else 'far' }} fa-heart"></i> 
+                                <span class="count">{{ post.likes_count | default(0) }}</span>
+                            </button>
+                            <button class="action-btn" onclick="document.getElementById('comments-{{ post.id }}').classList.toggle('hidden')">
+                                <i class="far fa-comment"></i> {{ post.comments_count | default(0) }}
+                            </button>
                             <button class="action-btn"><i class="fas fa-share-alt"></i></button>
+                        </div>
+                        <div id="comments-{{ post.id }}" class="hidden" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                            {% for comment in post.comments %}
+                                <div style="margin-bottom: 8px; font-size: 0.9rem;">
+                                    <strong>{{ comment.author.username }} :</strong> {{ comment.contenu }}
+                                </div>
+                            {% endfor %}
+                            <form action="{{ url_for('add_comment', post_id=post.id) }}" method="POST" style="display: flex; gap: 10px; margin-top: 10px;">
+                                <input type="text" name="contenu" placeholder="Écrire un commentaire..." style="flex: 1; border: 1px solid var(--border-color); border-radius: 20px; padding: 5px 15px; outline: none;">
+                                <button type="submit" class="send-btn"><i class="fas fa-paper-plane"></i></button>
+                            </form>
                         </div>
                     </article>
                     {% else %}
@@ -127,20 +198,17 @@
                         </div>
                         <p class="text-muted small-text">Paris Ynov Campus</p>
                         <div class="events-list">
-                            <div class="event-item event-orange">
-                                <i class="fas fa-bolt"></i>
+                            {% for item in news %}
+                            <div class="event-item {{ 'event-orange' if loop.index0 % 2 == 0 else 'event-blue' }}">
+                                <i class="fas {{ 'fa-bolt' if item.categorie == 'Challenge' else 'fa-calendar-alt' }}"></i>
                                 <div>
-                                    <h4>Challenge 48h Ynov</h4>
-                                    <span class="text-muted small-text">📅 11 avr. 📍 Paris</span>
+                                    <h4>{{ item.titre }}</h4>
+                                    <span class="text-muted small-text">📅 {{ item.date_event.strftime('%d %b') if item.date_event else 'À venir' }}</span>
                                 </div>
                             </div>
-                            <div class="event-item event-blue">
-                                <i class="fas fa-gamepad"></i>
-                                <div>
-                                    <h4>Tournoi FIFA BDS</h4>
-                                    <span class="text-muted small-text">📅 5 avr. 📍 Paris</span>
-                                </div>
-                            </div>
+                            {% else %}
+                            <p class="text-muted small-text">Aucune actualité récente.</p>
+                            {% endfor %}
                         </div>
                     </div>
                 </aside>
@@ -149,6 +217,30 @@
     </div>
 
     <script>
+        async function toggleLike(btn) {
+            const postId = btn.getAttribute('data-post-id');
+            try {
+                const response = await fetch(`/like/${postId}`, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const icon = btn.querySelector('i');
+                    const countSpan = btn.querySelector('.count');
+                    icon.classList.toggle('fas');
+                    icon.classList.toggle('far');
+                    icon.classList.toggle('text-danger');
+                    countSpan.innerText = data.count;
+                }
+            } catch (e) { console.error("Erreur Like:", e); }
+        }
+
+        function toggleMediaInput(select) {
+            const input = document.getElementById('media-url-input');
+            input.style.display = (select.value === 'text') ? 'none' : 'block';
+        }
+
         async function sendToIA() {
             const inputField = document.getElementById('ia-input');
             const history = document.getElementById('chat-history');
@@ -161,10 +253,10 @@
             history.scrollTop = history.scrollHeight;
 
             try {
-                const response = await fetch('/chat', {
+                const response = await fetch("{{ url_for('chat') }}", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message })
+                    body: JSON.stringify({ prompt: message })
                 });
                 const data = await response.json();
                 
@@ -182,7 +274,7 @@
             const testIcalUrl = "URL_ICAL_DE_TEST"; 
             
             try {
-                const response = await fetch('/load_edt', {
+                const response = await fetch("{{ url_for('load_edt') }}", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ical_url: testIcalUrl })

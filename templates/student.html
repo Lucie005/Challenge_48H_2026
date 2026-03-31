@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Y - Étudiants</title>
+    <title>Y - Utilisateurs</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
@@ -17,19 +17,22 @@
     <div class="app-container">
         
         <aside class="sidebar">
-            <a href="#" class="logo-btn">Y</a>
+            <a href="{{ url_for('home') }}" class="logo-btn">Y</a>
             <nav class="nav-menu">
-                <a href="index.html" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
-                <a href="profile.html" class="nav-icon" title="Profil"><i class="far fa-user"></i></a>
-                <a href="messages.html" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
-                <a href="student.html" class="nav-icon active" title="Étudiants"><i class="fas fa-user-friends"></i></a>
-                <a href="jobs.html" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
+                <a href="{{ url_for('home') }}" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
+                <a href="{{ url_for('messages') }}" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
+                <a href="{{ url_for('users_directory') }}" class="nav-icon active" title="Utilisateurs"><i class="fas fa-user-friends"></i></a>
+                <a href="{{ url_for('jobs') }}" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
+                <a href="{{ url_for('friends_page') }}" class="nav-icon" title="Mes Amis"><i class="fas fa-user-check"></i></a>
             </nav>
             <div class="spacer"></div>
-            <a href="#" class="nav-icon btn-add"><i class="fas fa-plus"></i></a>
-            
-            <img src="https://ui-avatars.com/api/?name=Alex+Martin&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
-            <a href="auth.html" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
+            <a href="{{ url_for('register') }}" class="nav-icon btn-add" title="Ajouter un compte"><i class="fas fa-plus"></i></a>
+            {% if session['user_id'] %}
+                <a href="{{ url_for('profile') }}" title="Mon profil">
+                    <img src="https://ui-avatars.com/api/?name={{ session['username'] | replace(' ', '+') }}&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
+                </a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
         </aside>
 
         <main class="main-content">
@@ -39,8 +42,8 @@
                     <div class="students-title-area">
                         <div class="icon-box-purple"><i class="fas fa-user-friends"></i></div>
                         <div>
-                            <h2>Étudiants <span class="text-muted" style="font-weight: normal;">Paris Ynov</span></h2>
-                            <p class="text-muted small-text">Connectez-vous avec vos camarades</p>
+                            <h2>Utilisateurs <span class="text-muted" style="font-weight: normal;">Communauté Ynov</span></h2>
+                            <p class="text-muted small-text">Connectez-vous avec vos camarades, intervenants et partenaires</p>
                         </div>
                     </div>
 
@@ -51,11 +54,11 @@
                         <i class="fas fa-filter text-muted"></i>
                         <select class="promo-select">
                             <option value="all">Toutes promos</option>
-                            <option value="b1">B1</option>
-                            <option value="b2">B2</option>
-                            <option value="b3">B3</option>
-                            <option value="m1">Mastère 1</option>
-                            <option value="m2">Mastère 2</option>
+                            <option value="B1" {{ 'selected' if request.args.get('promo') == 'B1' }}>B1</option>
+                            <option value="B2" {{ 'selected' if request.args.get('promo') == 'B2' }}>B2</option>
+                            <option value="B3" {{ 'selected' if request.args.get('promo') == 'B3' }}>B3</option>
+                            <option value="M1" {{ 'selected' if request.args.get('promo') == 'M1' }}>Mastère 1</option>
+                            <option value="M2" {{ 'selected' if request.args.get('promo') == 'M2' }}>Mastère 2</option>
                         </select>
                     </div>
                 </div>
@@ -63,7 +66,7 @@
                 <div class="campus-info-bar card">
                     <div class="online-status">
                         <span class="dot-green"></span>
-                        <strong>5</strong> étudiants en ligne
+                        <strong>8</strong> utilisateurs en ligne
                     </div>
                     <span class="text-muted" style="margin: 0 15px;">·</span>
                     <span class="text-muted">Paris Ynov Campus - 10 rue Brancion, 75015</span>
@@ -72,43 +75,72 @@
                 </div>
 
                 <div class="students-grid">
-                    {% for student in students %}
+                    {% for u in users %}
                     <div class="card student-card">
                         <div class="student-avatar-container">
-                            <img src="https://ui-avatars.com/api/?name={{ student.username | replace(' ', '+') }}&background=E5E7EB&color=1F2937&size=128" alt="{{ student.username }}" class="student-avatar">
+                            <img src="https://ui-avatars.com/api/?name={{ u.username | replace(' ', '+') }}&background=E5E7EB&color=1F2937&size=128" alt="{{ u.username }}" class="student-avatar">
                             <div class="online-indicator"></div>
                         </div>
 
-                        <h3 class="student-name">{{ student.username }}</h3>
-                        <span class="student-filiere"><i class="fas fa-book-open"></i> {{ student.filiere }}</span>
+                        <h3 class="student-name">{{ u.username }}</h3>
+                        <span class="student-filiere">
+                            <i class="fas {{ 'fa-book-open' if u.user_type == 'student' else ('fa-briefcase' if u.user_type == 'staff' else 'fa-building') }}"></i> 
+                            {% if u.user_type == 'student' %}{{ u.filiere }}
+                            {% elif u.user_type == 'staff' %}{{ u.role_title }}
+                            {% else %}{{ u.organization }}{% endif %}
+                        </span>
 
                         <p class="student-bio">
-                            {{ student.bio | truncate(70, true, '...') }}
+                            {{ u.bio | truncate(70, true, '...') if u.bio else 'Aucune description disponible.' }}
                         </p>
 
                         <div class="student-skills">
-                            {% for skill in student.skills[:3] %}
-                                <span class="skill-tag-mini">{{ skill.nom }}</span>
-                            {% endfor %}
-                            {% if student.skills|length > 3 %}
-                                <span class="skill-tag-mini">+{{ student.skills|length - 3 }}</span>
+                            {% if u.user_type == 'student' and u.skills %}
+                                {% set skills_list = u.skills.split(',') %}
+                                {% if skills_list %}
+                                    {% for skill in skills_list[:3] %}
+                                        <span class="skill-tag-mini">{{ skill.strip() }}</span>
+                                    {% endfor %}
+                                    {% if skills_list|length > 3 %}
+                                        <span class="skill-tag-mini">+{{ skills_list|length - 3 }}</span>
+                                    {% endif %}
+                                {% endif %}
+                            {% elif u.user_type == 'external' %}
+                                <span class="skill-tag-mini">Entreprise partenaire</span>
                             {% endif %}
                         </div>
 
                         <div class="student-stats">
                             <div class="stat-col">
-                                <strong>{{ student.followers_count | default(0) }}</strong>
+                                <strong>{{ u.followers_count | default(0) }}</strong>
                                 <span class="text-muted small-text">abonnés</span>
                             </div>
                             <div class="stat-col">
-                                <strong>{{ student.following_count | default(0) }}</strong>
+                                <strong>{{ u.following_count | default(0) }}</strong>
                                 <span class="text-muted small-text">abonnements</span>
                             </div>
                         </div>
 
                         <div class="student-actions">
-                            <a href="profile.html" class="btn-outline-primary" style="flex: 1;"><i class="fas fa-user"></i> Voir Profil</a>
-                            <button class="btn-icon-outline"><i class="far fa-comment"></i></button>
+                            <a href="{{ url_for('profile', user_id=u.id) }}" class="btn-outline-primary" style="flex: 1;"><i class="fas fa-user"></i> Voir Profil</a>
+                            {% if u.id != session['user_id'] %}
+                                {% if u.id in contact_status %}
+                                    {% if contact_status[u.id]['status'] == 'pending' and not contact_status[u.id]['is_sender'] %}
+                                        <button class="btn-icon-outline" onclick="respondFriend({{ contact_status[u.id]['request_id'] }}, 'accept')" title="Accepter" style="color: green; border-color: green;">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    {% else %}
+                                        <button class="btn-icon-outline" disabled title="{{ 'En attente' if contact_status[u.id]['status'] == 'pending' else 'Ami' }}">
+                                            <i class="fas {{ 'fa-clock' if contact_status[u.id]['status'] == 'pending' else 'fa-user-check' }}"></i>
+                                        </button>
+                                    {% endif %}
+                                {% else %}
+                                    <button class="btn-icon-outline" onclick="addFriend(this, {{ u.id }})" title="Ajouter en ami">
+                                        <i class="fas fa-user-plus"></i>
+                                    </button>
+                                {% endif %}
+                            {% endif %}
+                            <a href="{{ url_for('messages', user_id=u.id) }}" class="btn-icon-outline"><i class="far fa-comment"></i></a>
                         </div>
                     </div>
                     {% else %}
@@ -130,7 +162,7 @@
                             <div class="stat-col"><strong>142</strong><span class="text-muted small-text">abonnements</span></div>
                         </div>
                         <div class="student-actions">
-                            <a href="profile.html" class="btn-outline-primary" style="flex: 1;"><i class="fas fa-user"></i> Voir Profil</a>
+                            <a href="{{ url_for('profile') }}" class="btn-outline-primary" style="flex: 1;"><i class="fas fa-user"></i> Voir Profil</a>
                             <button class="btn-icon-outline"><i class="far fa-comment"></i></button>
                         </div>
                     </div>
@@ -140,5 +172,32 @@
         </main>
     </div>
 
+    <script>
+        async function addFriend(btn, id) {
+            try {
+                const response = await fetch(`/api/contact/add/${id}`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    btn.innerHTML = '<i class="fas fa-clock"></i>';
+                    btn.disabled = true;
+                    btn.title = "Demande envoyée";
+                } else {
+                    alert(data.error);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function respondFriend(requestId, action) {
+            try {
+                const response = await fetch(`/api/contact/${action}/${requestId}`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    location.reload(); // On recharge pour mettre à jour les boutons
+                } else {
+                    alert(data.error);
+                }
+            } catch (e) { console.error(e); }
+        }
+    </script>
 </body>
 </html>
