@@ -6,9 +6,27 @@
     <title>Y - Authentification</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <style>
+        .back-link {
+            align-self: flex-start;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+        .back-link:hover { color: var(--primary); }
+    </style>
 </head>
 <body>
     <div class="auth-container">
+        <a href="{{ url_for('home') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Retour à l'accueil
+        </a>
         <div class="auth-header">
             <div class="logo-y">Y</div>
             <div class="badge-campus">
@@ -17,25 +35,32 @@
         </div>
 
         <div class="auth-card">
+            <!-- Bloc d'affichage des erreurs -->
+            {% if error %}
+            <div class="error-banner" style="color: #EF4444; background: #FEE2E2; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; border: 1px solid #FCA5A5; text-align: center;">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+            {% endif %}
+
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('login')">Connexion</button>
-                <button class="tab-btn" onclick="switchTab('register')">Inscription</button>
+                <button class="tab-btn {{ 'active' if mode != 'register' else '' }}" onclick="switchTab('login')">Connexion</button>
+                <button class="tab-btn {{ 'active' if mode == 'register' else '' }}" onclick="switchTab('register')">Inscription</button>
             </div>
 
-            <form id="form-login" class="auth-form active-form" action="{{ url_for('login') }}" method="POST">
+            <form id="form-login" class="auth-form" action="{{ url_for('login') }}" method="POST" {% if mode == 'register' %}style="display: none;"{% endif %}>
                 <div class="input-group">
                     <i class="far fa-envelope"></i>
                     <input type="email" name="email" placeholder="prenom.nom@ynov.com" required>
                 </div>
                 <div class="input-group">
                     <i class="fas fa-lock"></i>
-                    <input type="password" name="password" placeholder="Mot de passe" required>
-                    <i class="far fa-eye toggle-password"></i>
+                    <input type="password" name="password" id="login-password" placeholder="Mot de passe" required>
+                    <i class="far fa-eye toggle-password" onclick="togglePasswordVisibility('login-password')"></i>
                 </div>
                 <button type="submit" class="btn-primary">Se connecter <i class="fas fa-arrow-right"></i></button>
             </form>
 
-            <form id="form-register" class="auth-form" action="{{ url_for('register') }}" method="POST" style="display: none;">
+            <form id="form-register" class="auth-form" action="{{ url_for('register') }}" method="POST" {% if mode != 'register' %}style="display: none;"{% endif %}>
                 <div class="input-group">
                     <i class="far fa-user"></i>
                     <input type="text" name="username" placeholder="Prénom Nom" required>
@@ -46,12 +71,12 @@
                 </div>
                 <div class="input-group">
                     <i class="fas fa-lock"></i>
-                    <input type="password" name="password" placeholder="Mot de passe" required>
-                    <i class="far fa-eye toggle-password"></i>
+                    <input type="password" name="password" id="reg-password" placeholder="Mot de passe" required>
+                    <i class="far fa-eye toggle-password" onclick="togglePasswordVisibility('reg-password')"></i>
                 </div>
                 <div class="input-group">
                     <i class="fas fa-lock"></i>
-                    <input type="password" name="confirm_password" placeholder="Confirmer le mot de passe" required>
+                    <input type="password" name="confirm_password" id="reg-confirm" placeholder="Confirmer le mot de passe" required>
                 </div>
                 <div class="input-group">
                     <i class="fas fa-user-tag"></i>
@@ -68,7 +93,10 @@
                         <option value="" disabled selected>Mon Campus</option>
                         <option value="1">Paris Ynov Campus</option>
                         <option value="2">Lyon Ynov Campus</option>
-                        <option value="3">Nanterre Ynov Campus</option>
+                        <option value="3">Bordeaux Ynov Campus</option>
+                        <option value="4">Toulouse Ynov Campus</option>
+                        <option value="5">Nantes Ynov Campus</option>
+                        <option value="8">Paris Ouest Ynov Campus</option>
                     </select>
                 </div>
 
@@ -151,6 +179,19 @@
                 registerForm.style.display = 'flex';
                 tabs[0].classList.remove('active');
                 tabs[1].classList.add('active');
+            }
+        }
+
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         }
 

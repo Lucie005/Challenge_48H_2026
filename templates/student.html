@@ -20,15 +20,17 @@
             <a href="{{ url_for('home') }}" class="logo-btn">Y</a>
             <nav class="nav-menu">
                 <a href="{{ url_for('home') }}" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
-                <a href="{{ url_for('profile') }}" class="nav-icon" title="Profil"><i class="far fa-user"></i></a>
                 <a href="{{ url_for('messages') }}" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
                 <a href="{{ url_for('students_directory') }}" class="nav-icon active" title="Étudiants"><i class="fas fa-user-friends"></i></a>
                 <a href="{{ url_for('jobs') }}" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
             </nav>
             <div class="spacer"></div>
-            <a href="#" class="nav-icon btn-add"><i class="fas fa-plus"></i></a>
-            
-            <img src="https://ui-avatars.com/api/?name={{ session['username'] | replace(' ', '+') if session['username'] else 'User' }}&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
+            <a href="{{ url_for('register') }}" class="nav-icon btn-add" title="Ajouter un compte"><i class="fas fa-plus"></i></a>
+            {% if session['user_id'] %}
+                <a href="{{ url_for('profile') }}" title="Mon profil">
+                    <img src="https://ui-avatars.com/api/?name={{ session['username'] | replace(' ', '+') }}&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
+                </a>
+            {% endif %}
             <a href="{{ url_for('logout') }}" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
         </aside>
 
@@ -87,11 +89,16 @@
                         </p>
 
                         <div class="student-skills">
-                            {% for skill in student.skills[:3] %}
-                                <span class="skill-tag-mini">{{ skill.nom }}</span>
-                            {% endfor %}
-                            {% if student.skills|length > 3 %}
-                                <span class="skill-tag-mini">+{{ student.skills|length - 3 }}</span>
+                            {% if student.skills and student.skills != None %}
+                                {% set skills_list = student.skills.split(',') %}
+                                {% if skills_list %}
+                                    {% for skill in skills_list[:3] %}
+                                        <span class="skill-tag-mini">{{ skill.strip() }}</span>
+                                    {% endfor %}
+                                    {% if skills_list|length > 3 %}
+                                        <span class="skill-tag-mini">+{{ skills_list|length - 3 }}</span>
+                                    {% endif %}
+                                {% endif %}
                             {% endif %}
                         </div>
 
@@ -107,8 +114,19 @@
                         </div>
 
                         <div class="student-actions">
-                            <a href="{{ url_for('profile') }}" class="btn-outline-primary" style="flex: 1;"><i class="fas fa-user"></i> Voir Profil</a>
-                            <button class="btn-icon-outline"><i class="far fa-comment"></i></button>
+                            <a href="{{ url_for('profile', user_id=student.id) }}" class="btn-outline-primary" style="flex: 1;"><i class="fas fa-user"></i> Voir Profil</a>
+                            {% if student.id != session['user_id'] %}
+                                {% if student.id in contact_status %}
+                                    <button class="btn-icon-outline" disabled title="{{ 'Demande en attente' if contact_status[student.id] == 'pending' else 'Déjà ami' }}">
+                                        <i class="fas {{ 'fa-clock' if contact_status[student.id] == 'pending' else 'fa-user-check' }}"></i>
+                                    </button>
+                                {% else %}
+                                    <button class="btn-icon-outline" onclick="addFriend("this."", {{student.id}})" title="Ajouter en ami">
+                                        <i class="fas fa-user-plus"></i>
+                                    </button>
+                                {% endif %}
+                            {% endif %}
+                            <a href="{{ url_for('messages', user_id=student.id) }}" class="btn-icon-outline"><i class="far fa-comment"></i></a>
                         </div>
                     </div>
                     {% else %}
@@ -140,5 +158,20 @@
         </main>
     </div>
 
+    <script>
+        async function addFriend(btn, id) {
+            try {
+                const response = await fetch(`/api/contact/add/${id}`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    btn.innerHTML = '<i class="fas fa-clock"></i>';
+                    btn.disabled = true;
+                    btn.title = "Demande envoyée";
+                } else {
+                    alert(data.error);
+                }
+            } catch (e) { console.error(e); }
+        }
+    </script>
 </body>
 </html>

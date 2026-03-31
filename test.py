@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# CONFIGURATION (Vérifie bien le nom de la base 'ynov_social')
+### CONFIGURATION (Doit correspondre à app.py)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Admin123!@localhost/ynov_social'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

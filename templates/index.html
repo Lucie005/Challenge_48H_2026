@@ -20,15 +20,20 @@
             <a href="{{ url_for('home') }}" class="logo-btn">Y</a>
             <nav class="nav-menu">
                 <a href="{{ url_for('home') }}" class="nav-icon active" title="Accueil"><i class="fas fa-home"></i></a>
-                <a href="{{ url_for('profile') }}" class="nav-icon" title="Profil"><i class="far fa-user"></i></a>
                 <a href="{{ url_for('messages') }}" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
                 <a href="{{ url_for('students_directory') }}" class="nav-icon" title="Étudiants"><i class="fas fa-user-friends"></i></a>
                 <a href="{{ url_for('jobs') }}" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
             </nav>
             <div class="spacer"></div>
-            <a href="#" class="nav-icon btn-add"><i class="fas fa-plus"></i></a>
-            <img src="https://ui-avatars.com/api/?name={{ user.username | replace(' ', '+') }}&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
-            <a href="{{ url_for('logout') }}" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
+            <a href="{{ url_for('register') }}" class="nav-icon btn-add" title="Ajouter un compte"><i class="fas fa-plus"></i></a>
+            {% if user %}
+                <a href="{{ url_for('profile') }}" title="Mon profil">
+                    <img src="https://ui-avatars.com/api/?name={{ user.username | replace(' ', '+') }}&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-icon" title="Connexion"><i class="fas fa-sign-in-alt"></i></a>
+            {% endif %}
         </aside>
 
         <main class="main-content">
@@ -41,36 +46,81 @@
                             <span class="text-muted">Paris Ynov Campus</span>
                         </div>
                         <div class="feed-filters">
-                            <button class="filter-btn active">Tout</button>
-                            <button class="filter-btn">Post</button>
-                            <button class="filter-btn">Projet</button>
-                            <button class="filter-btn">Recherche</button>
+                            <a href="{{ url_for('home', filter='all') }}" class="filter-btn {{ 'active' if current_filter == 'all' else '' }}">Tout</a>
+                            <a href="{{ url_for('home', filter='post') }}" class="filter-btn {{ 'active' if current_filter == 'post' else '' }}">Post</a>
+                            <a href="{{ url_for('home', filter='projet') }}" class="filter-btn {{ 'active' if current_filter == 'projet' else '' }}">Projet</a>
+                            <a href="{{ url_for('home', filter='recherche') }}" class="filter-btn {{ 'active' if current_filter == 'recherche' else '' }}">Recherche</a>
                         </div>
                     </div>
 
-                    <div class="card create-post">
-                        <img src="https://ui-avatars.com/api/?name=Alex+Martin&background=7C3AED&color=fff&size=50" alt="Avatar" class="avatar">
-                        <textarea placeholder="Partager avec les étudiants de Paris Ynov Campus..." rows="2"></textarea>
+                    {% if user %}
+                    <form action="{{ url_for('create_post') }}" method="POST" class="card create-post-form">
+                        <div class="create-post-header">
+                            <img src="https://ui-avatars.com/api/?name={{ user.username | replace(' ', '+') }}&background=7C3AED&color=fff&size=50" alt="Avatar" class="avatar">
+                            <textarea name="content" placeholder="Partager avec les étudiants de Paris Ynov Campus..." rows="2" required></textarea>
+                        </div>
+                        <div class="create-post-options">
+                            <div class="option-group">
+                                <label><i class="fas fa-tag"></i> Type :</label>
+                                <select name="post_type">
+                                    <option value="post">Post</option>
+                                    <option value="projet">🚀 Projet</option>
+                                    <option value="recherche">🔍 Recherche</option>
+                                </select>
+                            </div>
+                            <div class="option-group">
+                                <label><i class="fas fa-icons"></i> Média :</label>
+                                <select name="media_type" onchange="toggleMediaInput(this)">
+                                    <option value="text">Texte</option>
+                                    <option value="image">Image</option>
+                                    <option value="video">Vidéo</option>
+                                </select>
+                            </div>
+                            <input type="text" name="media_url" id="media-url-input" placeholder="URL du média (JPG, PNG, MP4...)" style="display:none;">
+                            <button type="submit" class="btn-publish">Publier <i class="far fa-paper-plane"></i></button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div class="card" style="text-align: center; padding: 20px;">
+                        <p class="text-muted">Vous devez être connecté pour publier un post.</p>
+                        <a href="{{ url_for('login') }}" class="btn-postuler" style="display: inline-block; width: auto; margin-top: 10px; padding: 8px 20px;">Se connecter</a>
                     </div>
+                    {% endif %}
 
                     {% for post in posts %}
                     <article class="card post-card">
                         <div class="post-header">
-                            <img src="{{ url_for('static', filename='img/' + (post.author.photo | default('default-avatar.jpg'))) }}" alt="{{ post.author.username }}" class="avatar">
+                            <a href="{{ url_for('profile', user_id=post.author.id) }}">
+                                <img src="{{ url_for('static', filename='img/' + (post.author.photo | default('default-avatar.jpg'))) }}" alt="{{ post.author.username }}" class="avatar">
+                            </a>
                             <div class="post-meta">
-                                <h4>{{ post.author.username }} 
-                                    {% if post.is_projet %}
-                                        <span class="badge badge-projet">🚀 Projet</span>
-                                    {% else %}
-                                        <span class="badge badge-post">Post</span>
-                                    {% endif %}
-                                </h4>
-                                <span class="text-muted">{{ post.author.filiere }} · {{ post.created_at }}</span>
+                                <a href="{{ url_for('profile', user_id=post.author.id) }}" style="text-decoration: none; color: inherit;">
+                                    <h4>{{ post.author.username }} 
+                                        {% if post.is_projet %}
+                                            <span class="badge badge-projet">🚀 Projet</span>
+                                        {% elif post.is_recherche %}
+                                            <span class="badge badge-recherche">🔍 Recherche</span>
+                                        {% else %}
+                                            <span class="badge badge-post">Post</span>
+                                        {% endif %}
+                                    </h4>
+                                </a>
+                                <span class="text-muted">{{ post.author.filiere if post.author.user_type == 'student' else post.author.role_title }} · {{ post.timestamp.strftime('%d/%m à %H:%M') }}</span>
                             </div>
                             <i class="far fa-bookmark bookmark-icon"></i>
                         </div>
                         <div class="post-body">
                             <p>{{ post.content }}</p>
+                            {% if post.media_url %}
+                                {% if post.media_type == 'image' %}
+                                    <img src="{{ post.media_url }}" alt="Post media" style="max-width: 100%; border-radius: 12px; margin-top: 10px;">
+                                {% elif post.media_type == 'video' %}
+                                    <video controls style="max-width: 100%; border-radius: 12px; margin-top: 10px;">
+                                        <source src="{{ post.media_url }}" type="video/mp4">
+                                        Votre navigateur ne supporte pas la lecture de vidéos.
+                                    </video>
+                                {% endif %}
+                            {% endif %}
                             <div class="post-tags">
                                 <span class="tag">#Ynov</span>
                             </div>
@@ -127,20 +177,17 @@
                         </div>
                         <p class="text-muted small-text">Paris Ynov Campus</p>
                         <div class="events-list">
-                            <div class="event-item event-orange">
-                                <i class="fas fa-bolt"></i>
+                            {% for item in news %}
+                            <div class="event-item {{ 'event-orange' if loop.index0 % 2 == 0 else 'event-blue' }}">
+                                <i class="fas {{ 'fa-bolt' if item.categorie == 'Challenge' else 'fa-calendar-alt' }}"></i>
                                 <div>
-                                    <h4>Challenge 48h Ynov</h4>
-                                    <span class="text-muted small-text">📅 11 avr. 📍 Paris</span>
+                                    <h4>{{ item.titre }}</h4>
+                                    <span class="text-muted small-text">📅 {{ item.date_event.strftime('%d %b') if item.date_event else 'À venir' }}</span>
                                 </div>
                             </div>
-                            <div class="event-item event-blue">
-                                <i class="fas fa-gamepad"></i>
-                                <div>
-                                    <h4>Tournoi FIFA BDS</h4>
-                                    <span class="text-muted small-text">📅 5 avr. 📍 Paris</span>
-                                </div>
-                            </div>
+                            {% else %}
+                            <p class="text-muted small-text">Aucune actualité récente.</p>
+                            {% endfor %}
                         </div>
                     </div>
                 </aside>
@@ -149,6 +196,11 @@
     </div>
 
     <script>
+        function toggleMediaInput(select) {
+            const input = document.getElementById('media-url-input');
+            input.style.display = (select.value === 'text') ? 'none' : 'block';
+        }
+
         async function sendToIA() {
             const inputField = document.getElementById('ia-input');
             const history = document.getElementById('chat-history');

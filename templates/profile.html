@@ -19,14 +19,15 @@
             <a href="{{ url_for('home') }}" class="logo-btn">Y</a>
             <nav class="nav-menu">
                 <a href="{{ url_for('home') }}" class="nav-icon" title="Accueil"><i class="fas fa-home"></i></a>
-                <a href="{{ url_for('profile') }}" class="nav-icon active" title="Profil"><i class="far fa-user"></i></a>
                 <a href="{{ url_for('messages') }}" class="nav-icon" title="Messages"><i class="far fa-comment-dots"></i></a>
                 <a href="{{ url_for('students_directory') }}" class="nav-icon" title="Étudiants"><i class="fas fa-user-friends"></i></a>
                 <a href="{{ url_for('jobs') }}" class="nav-icon" title="Jobs"><i class="fas fa-briefcase"></i></a>
             </nav>
             <div class="spacer"></div>
-            <a href="#" class="nav-icon btn-add"><i class="fas fa-plus"></i></a>
-            <img src="https://ui-avatars.com/api/?name=Alex+Martin&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
+            <a href="{{ url_for('register') }}" class="nav-icon btn-add" title="Ajouter un compte"><i class="fas fa-plus"></i></a>
+            <a href="{{ url_for('profile') }}" title="Mon profil">
+                <img src="https://ui-avatars.com/api/?name={{ session['username'] | replace(' ', '+') if session['username'] else 'User' }}&background=7C3AED&color=fff&size=40" alt="Mon profil" class="profile-mini">
+            </a>
             <a href="{{ url_for('logout') }}" class="nav-icon nav-icon-danger logout-pc" title="Déconnexion"><i class="fas fa-sign-out-alt"></i></a>
         </aside>
 
@@ -39,26 +40,50 @@
                     </div>
                     
                     <div class="profile-info-container">
-                        <div class="profile-main-row">
-                            <img src="https://ui-avatars.com/api/?name={{ user.username | default('Alex Martin') | replace(' ', '+') }}&background=7C3AED&color=fff&size=128" alt="Photo de profil" class="avatar-large">                            
-                            <div class="profile-actions">
-                                <a href="#" class="btn-outline"><i class="fas fa-pen"></i> Modifier</a>
-                                <a href="{{ url_for('logout') }}" class="btn-outline btn-outline-danger logout-profile"><i class="fas fa-sign-out-alt"></i> Quitter</a>
+                        <form action="{{ url_for('update_profile') }}" method="POST">
+                            <div class="profile-main-row">
+                                <img src="https://ui-avatars.com/api/?name={{ user.username | default('Alex') | replace(' ', '+') }}&background=7C3AED&color=fff&size=128" alt="Photo de profil" class="avatar-large">                            
+                                <div class="profile-actions">
+                                    {% if is_own_profile %}
+                                        <button type="submit" class="btn-outline" style="background: var(--primary); color: white; border: none;">
+                                            <i class="fas fa-save"></i> Enregistrer
+                                        </button>
+                                        <a href="{{ url_for('logout') }}" class="btn-outline btn-outline-danger logout-profile"><i class="fas fa-sign-out-alt"></i> Quitter</a>
+                                    {% else %}
+                                        {% if rel_status %}
+                                            <button class="btn-outline" disabled>
+                                                <i class="fas {{ 'fa-clock' if rel_status == 'pending' else 'fa-user-check' }}"></i>
+                                                {{ 'Demande envoyée' if rel_status == 'pending' else 'Ami' }}
+                                            </button>
+                                        {% else %}
+                                            <button class="btn-outline" id="add-btn-profile" onclick="addFriendProfile({{ users.id }})"><i class="fas fa-user-plus"></i> Ajouter</button>
+                                        {% endif %}
+                                        <a href="{{ url_for('messages', user_id=user.id) }}" class="btn-outline"><i class="far fa-comment"></i> Message</a>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
 
-                        <h2 class="profile-name">{{ user.username | default('Alex Martin') }}</h2>
-                        <p class="profile-filiere"><i class="fas fa-book-open"></i> {{ user.filiere | default('B3 Dev') }}</p>
+                            {% if is_own_profile %}
+                                <input type="text" name="username" class="profile-name" value="{{ user.username }}" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 5px; width: 100%; margin-bottom: 10px;">
+                                <input type="text" name="filiere" class="profile-filiere" value="{{ user.filiere }}" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 5px; width: 100%; margin-bottom: 10px;">
+                            {% else %}
+                                <h2 class="profile-name">{{ user.username }}</h2>
+                                <p class="profile-filiere"><i class="fas fa-book-open"></i> {{ user.filiere or 'Non renseigné' }}</p>
+                            {% endif %}
 
-                        <div class="profile-stats">
-                            <div class="stat-item"><span class="stat-number">124</span><span class="text-muted small-text">Abonnés</span></div>
-                            <div class="stat-item"><span class="stat-number">87</span><span class="text-muted small-text">Abonnements</span></div>
-                            <div class="stat-item"><span class="stat-number">0</span><span class="text-muted small-text">Publications</span></div>
-                        </div>
+                            <div class="profile-stats">
+                                <div class="stat-item"><span class="stat-number">{{ user.followers_count | default(0) }}</span><span class="text-muted small-text">Abonnés</span></div>
+                                <div class="stat-item"><span class="stat-number">{{ user.following_count | default(0) }}</span><span class="text-muted small-text">Abonnements</span></div>
+                                <div class="stat-item"><span class="stat-number">{{ user.posts | length }}</span><span class="text-muted small-text">Publications</span></div>
+                            </div>
 
-                        <p class="profile-bio">
-                            {{ user.bio | default("Étudiant passionné par le développement web et l'IA. Je travaille sur des projets open-source et j'adore collaborer avec d'autres étudiants.") }}
-                        </p>
+                            {% if is_own_profile %}
+                                <textarea name="bio" class="profile-bio" style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; min-height: 100px;">{{ user.bio }}</textarea>
+                                <input type="text" name="skills" placeholder="Compétences (séparées par des virgules)" value="{{ user.skills }}" style="width: 100%; margin-top: 10px; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px;">
+                            {% else %}
+                                <p class="profile-bio">{{ user.bio or "Aucune bio renseignée." }}</p>
+                            {% endif %}
+                        </form>
 
                         <div class="profile-links">
                             <a href="#" class="link-btn"><i class="fab fa-github"></i> GitHub</a>
@@ -92,5 +117,18 @@
         </main>
     </div>
 
+    <script>
+        async function addFriendProfile(id) {
+            const btn = document.getElementById('add-btn-profile');
+            try {
+                const response = await fetch(`/api/contact/add/${id}`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    btn.innerHTML = '<i class="fas fa-clock"></i> Demande envoyée';
+                    btn.disabled = true;
+                }
+            } catch (e) { console.error(e); }
+        }
+    </script>
 </body>
 </html>
